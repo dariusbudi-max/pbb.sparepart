@@ -31,22 +31,18 @@
 <body class="bg-slate-50 text-slate-900 overflow-hidden font-sans">
     <div id="app" v-cloak class="h-screen w-screen flex">
 
-        <div v-if="loading" class="fixed inset-0 bg-indigo-900/10 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div class="flex flex-col items-center">
-                <div class="relative mb-8">
-                    <div class="text-6xl animate-bounce drop-shadow-2xl">
-                        📦
-                    </div>
-                    <div class="w-12 h-2 bg-slate-900/20 rounded-full mx-auto blur-sm animate-pulse scale-x-125 mt-2"></div>
-                </div>
+        <div v-if="loading" class="fixed inset-0 bg-black/20 backdrop-blur-md z-[100] flex items-center justify-center">
+            <div class="bg-white/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl border border-white/40 px-8 py-6 rounded-[28px] flex flex-col items-center gap-4">
                 
-                <div class="bg-white px-6 py-2 rounded-full shadow-lg border border-slate-100 flex items-center gap-2">
-                    <span class="text-xs font-black text-indigo-600 uppercase tracking-widest">Memuat</span>
-                    <div class="flex gap-1">
-                        <div class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce"></div>
-                        <div class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                        <div class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                    </div>
+                <div class="relative w-12 h-12">
+                    <svg class="animate-spin w-full h-full text-blue-600" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" class="opacity-20"></circle>
+                        <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" stroke-dasharray="200" stroke-dashoffset="120" stroke-linecap="round"></circle>
+                    </svg>
+                </div>
+
+                <div class="text-sm font-semibold text-slate-700 tracking-wide">
+                    Memuat data...
                 </div>
             </div>
         </div>
@@ -592,127 +588,131 @@
                         </div>
 
                         <transition name="fade">
-                            <div v-if="showCart" class="fixed lg:static inset-0 lg:w-[400px] bg-white border-l z-[60] flex flex-col shadow-2xl lg:shadow-none">
+                            <div v-if="showCart" class="fixed inset-0 z-[100] flex items-start justify-center pt-0 lg:pt-10 bg-slate-900/30 backdrop-blur-sm">
                                 
-                                <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-white shadow-sm">
-                                    <div class="relative flex items-center">
-                                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                            <i class="fa-solid fa-basket-shopping text-sm"></i>
-                                        </div>
-                                        <span v-if="cart.length"
-                                            class="absolute -top-2 -right-2 bg-rose-500 text-white text-[9px] font-black min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center border-2 border-white">
-                                            {{ cart.length }}
-                                        </span>
-                                    </div>
-
-                                    <div class="flex items-center gap-2">
-                                        <button v-if="cart.length"
-                                            @click="resetTransactionForm"
-                                            class="w-8 h-8 rounded-lg bg-slate-100 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition flex items-center justify-center">
-                                            <i class="fa-solid fa-rotate-left text-xs"></i>
-                                        </button>
-                                        <button @click="showCart = false"
-                                            class="lg:hidden w-8 h-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-500 transition flex items-center justify-center">
-                                            <i class="fa-solid fa-xmark text-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="flex-1 overflow-y-auto p-2 md:p-3 space-y-2 md:space-y-3 bg-slate-50/50 custom-scrollbar">
-                                    <div v-for="(item, idx) in cart" :key="item.kode" 
-                                        :class="isStockInsufficient(item) ? 'border-rose-200 bg-rose-50' : 'bg-white border-slate-100 shadow-sm'"
-                                        class="p-2.5 md:p-3 rounded-xl border flex flex-col gap-1.5 transition-all hover:shadow-sm relative">
-                                        
-                                        <div class="flex justify-between items-start gap-2">
-                                            <div class="flex-1 min-w-0">
-                                                <div v-if="isStockInsufficient(item)" class="flex items-center gap-1 text-[9px] font-bold text-rose-600 uppercase mb-0.5">
-                                                    <i class="fa-solid fa-circle-exclamation"></i> 
-                                                    <span>Stok sisa {{ getMasterStock(item.kode) }}</span>
-                                                </div>
-                                                <h4 class="font-bold text-[13px] md:text-sm text-slate-800 leading-snug break-words uppercase tracking-tight">
-                                                    {{ item.nama }}
-                                                </h4>
-                                                <p class="text-[10px] font-bold text-indigo-500 uppercase truncate">{{ item.kode }}</p>
+                                <div class="w-full h-full lg:h-auto lg:w-[450px] lg:max-h-[85vh] bg-white lg:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+                                    
+                                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-white shadow-sm z-10">
+                                        <div class="relative flex items-center">
+                                            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                                <i class="fa-solid fa-basket-shopping text-sm"></i>
                                             </div>
+                                            <span v-if="cart.length"
+                                                class="absolute -top-2 -right-2 bg-rose-500 text-white text-[9px] font-black min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center border-2 border-white">
+                                                {{ cart.length }}
+                                            </span>
+                                        </div>
 
-                                            <button @click="removeFromCart(item.kode)"
-                                                class="text-slate-300 hover:text-rose-500 p-1 transition-colors">
-                                                <i class="fa-solid fa-xmark text-lg"></i>
+                                        <div class="flex items-center gap-2">
+                                            <button v-if="cart.length"
+                                                @click="resetTransactionForm"
+                                                class="w-8 h-8 rounded-lg bg-slate-100 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition flex items-center justify-center">
+                                                <i class="fa-solid fa-rotate-left text-xs"></i>
+                                            </button>
+                                            <button @click="showCart = false"
+                                                class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-500 transition flex items-center justify-center">
+                                                <i class="fa-solid fa-xmark text-sm"></i>
                                             </button>
                                         </div>
+                                    </div>
 
-                                        <div class="flex justify-end items-center mt-1">
-                                            <div class="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm">
-                                                <button @click="item.qty > 1 ? item.qty-- : removeFromCart(item.kode)" 
-                                                    class="w-7 h-7 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
-                                                    <i class="fa-solid fa-minus text-[10px]"></i>
+                                    <div class="flex-1 overflow-y-auto p-2 md:p-4 space-y-2 md:space-y-3 bg-slate-50/50 custom-scrollbar">
+                                        <div v-for="(item, idx) in cart" :key="item.kode" 
+                                            :class="isStockInsufficient(item) ? 'border-rose-200 bg-rose-50' : 'bg-white border-slate-100 shadow-sm'"
+                                            class="p-2.5 md:p-3 rounded-xl border flex flex-col gap-1.5 transition-all hover:shadow-md relative">
+                                            
+                                            <div class="flex justify-between items-start gap-2">
+                                                <div class="flex-1 min-w-0">
+                                                    <div v-if="isStockInsufficient(item)" class="flex items-center gap-1 text-[9px] font-bold text-rose-600 uppercase mb-0.5">
+                                                        <i class="fa-solid fa-circle-exclamation"></i> 
+                                                        <span>Stok sisa {{ getMasterStock(item.kode) }}</span>
+                                                    </div>
+                                                    <h4 class="font-bold text-[13px] md:text-sm text-slate-800 leading-snug break-words uppercase tracking-tight">
+                                                        {{ item.nama }}
+                                                    </h4>
+                                                    <p class="text-[10px] font-bold text-indigo-500 uppercase truncate">{{ item.kode }}</p>
+                                                </div>
+
+                                                <button @click="removeFromCart(item.kode)"
+                                                    class="text-slate-300 hover:text-rose-500 p-1 transition-colors">
+                                                    <i class="fa-solid fa-xmark text-lg"></i>
                                                 </button>
-                                                
-                                                <input v-model.number="item.qty" 
-                                                    type="number" 
-                                                    min="1"
-                                                    class="w-9 h-7 bg-transparent border-x border-slate-200 text-center font-bold text-slate-700 text-[11px] focus:ring-0 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                                
-                                                <button @click="item.qty++" 
-                                                    class="w-7 h-7 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
-                                                    <i class="fa-solid fa-plus text-[9px]"></i>
-                                                </button>
+                                            </div>
+
+                                            <div class="flex justify-end items-center mt-1">
+                                                <div class="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm">
+                                                    <button @click="item.qty > 1 ? item.qty-- : removeFromCart(item.kode)" 
+                                                        class="w-7 h-7 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
+                                                        <i class="fa-solid fa-minus text-[10px]"></i>
+                                                    </button>
+                                                    
+                                                    <input v-model.number="item.qty" 
+                                                        type="number" 
+                                                        min="1"
+                                                        class="w-9 h-7 bg-transparent border-x border-slate-200 text-center font-bold text-slate-700 text-[11px] focus:ring-0 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                    
+                                                    <button @click="item.qty++" 
+                                                        class="w-7 h-7 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors">
+                                                        <i class="fa-solid fa-plus text-[9px]"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="p-4 bg-white border-t border-slate-100 space-y-3">
-                                    <div class="flex gap-2">
-                                        <div class="relative flex-1">
-                                            <i class="fa-solid fa-arrows-rotate absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                            <select v-model="txType" class="w-full pl-8 pr-3 py-2.5 bg-slate-100 rounded-lg text-[11px] font-bold border-none focus:ring-2 focus:ring-indigo-500 outline-none uppercase cursor-pointer">
+                                    <div class="p-4 bg-white border-t border-slate-100 space-y-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+                                        <div class="flex gap-2">
+                                            <div class="relative flex-1">
+                                                <i class="fa-solid fa-arrows-rotate absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                                <select v-model="txType" class="w-full pl-8 pr-3 py-2.5 bg-slate-100 rounded-lg text-[11px] font-bold border-none focus:ring-2 focus:ring-indigo-500 outline-none uppercase cursor-pointer">
                                                     <option value="KELUAR">🔴 KELUAR</option>
                                                     <option value="MASUK">🟢 MASUK</option>
                                                     <option value="OPNAME">🔍 OPNAME</option>
                                                     <option value="RETURN">🔄 RETURN</option>
                                                 </select>
+                                            </div>
+                                            <div class="relative flex-1">
+                                                <i class="fa-solid fa-building absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                                <input 
+                                                    v-model="txDept"
+                                                    list="deptList"
+                                                    placeholder="Dept..."
+                                                    class="w-full pl-8 pr-8 py-2.5 bg-slate-100 rounded-lg text-[11px] font-bold border-none focus:ring-2 focus:ring-indigo-500 outline-none uppercase placeholder:text-slate-400"
+                                                >
+                                                <button 
+                                                    v-if="txDept"
+                                                    @click="txDept=''"
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition"
+                                                >
+                                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                                </button>
+                                                <datalist id="deptList">
+                                                    <option v-for="d in departments" :key="d" :value="d">{{ d }}</option>
+                                                </datalist>
+                                            </div>
                                         </div>
-                                        <div class="relative flex-1">
-                                            <i class="fa-solid fa-building absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                            <input 
-                                                v-model="txDept"
-                                                list="deptList"
-                                                placeholder="Dept..."
-                                                class="w-full pl-8 pr-8 py-2.5 bg-slate-100 rounded-lg text-[11px] font-bold border-none focus:ring-2 focus:ring-indigo-500 outline-none uppercase placeholder:text-slate-400"
-                                            >
-                                            <button 
-                                                v-if="txDept"
-                                                @click="txDept=''"
-                                                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition"
-                                            >
-                                                <i class="fa-solid fa-xmark text-xs"></i>
-                                            </button>
-                                            <datalist id="deptList">
-                                                <option v-for="d in departments" :key="d" :value="d">{{ d }}</option>
-                                            </datalist>
+                                        <div class="relative">
+                                            <i class="fa-solid fa-note-sticky absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                            <textarea 
+                                                v-model="txNote"
+                                                rows="2"
+                                                placeholder="Catatan..."
+                                                class="w-full pl-8 pr-3 py-2.5 bg-slate-100 rounded-lg text-[11px] font-medium border-none focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                                            ></textarea>
                                         </div>
+                                        <button 
+                                            @click="processTx"
+                                            :disabled="cart.length === 0 || (!txDept && txType !== 'OPNAME')"
+                                            class="w-full py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider text-white transition-all flex items-center justify-center gap-2"
+                                            :class="(cart.length > 0 && (txDept || txType === 'OPNAME')) 
+                                                ? 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200' 
+                                                : 'bg-slate-300'"
+                                        >
+                                            <i class="fa-solid fa-paper-plane"></i>
+                                            <span>Proses</span>
+                                        </button>
                                     </div>
-                                    <div class="relative">
-                                        <i class="fa-solid fa-note-sticky absolute left-3 top-3 text-slate-400 text-xs"></i>
-                                        <textarea 
-                                            v-model="txNote"
-                                            rows="2"
-                                            placeholder="Catatan..."
-                                            class="w-full pl-8 pr-3 py-2.5 bg-slate-100 rounded-lg text-[11px] font-medium border-none focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
-                                        ></textarea>
-                                    </div>
-                                    <button 
-                                        @click="processTx"
-                                        :disabled="cart.length === 0 || (!txDept && txType !== 'OPNAME')"
-                                        class="w-full py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider text-white transition-all flex items-center justify-center gap-2"
-                                        :class="(cart.length > 0 && (txDept || txType === 'OPNAME')) 
-                                            ? 'bg-indigo-600 hover:bg-indigo-700' 
-                                            : 'bg-slate-300'"
-                                    >
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                        <span>Proses</span>
-                                    </button>
+                                    
                                 </div>
                             </div>
                         </transition>
@@ -1051,7 +1051,6 @@
                 <main v-if="page==='user_management'" class="flex-1 flex flex-col h-screen overflow-hidden bg-[#f8fafc] font-sans">
     
                     <div class="px-6 md:px-8 py-5 md:py-6 bg-white border-b border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
-    
                         <div class="shrink-0">
                             <h2 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                                 <i class="fa-solid fa-users-gear text-blue-600"></i> Kelola User
@@ -1062,114 +1061,128 @@
                         </div>
                         
                         <div class="flex flex-row items-center gap-2 md:gap-3 w-full md:w-auto md:max-w-md justify-end">
-                            
                             <div class="relative flex-1 group">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors text-xs md:text-sm"></i>
                                 <input v-model="userSearchQuery" type="text" 
                                     placeholder="Cari user..." 
                                     class="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm font-medium text-slate-700 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:font-normal placeholder:text-slate-400">
                             </div>
-                            
                             <button @click="showUserModal = true" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 shrink-0">
                                 <i class="fa-solid fa-user-plus"></i> <span class="hidden sm:inline">Tambah User</span>
                             </button>
-                            
                         </div>
                     </div>
 
                     <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                        
                         <div class="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-slate-50/50 border-b border-slate-100">
-                                    <tr class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">
-                                        <th class="px-6 py-4">Informasi Pengguna</th>
-                                        <th class="px-6 py-4">Level Akses</th>
-                                        <th class="px-6 py-4 text-center">Izin Lihat Foto</th>
-                                        <th class="px-6 py-4">Status Akun</th>
-                                        <th class="px-6 py-4 text-right">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    <tr v-for="u in filteredAdminUsers" :key="u.username" class="hover:bg-slate-50/80 transition-colors group">
+                            <div class="overflow-auto w-full max-h-[900px] custom-scrollbar">
+                                <table class="w-full text-left border-collapse min-w-[900px]">
+                                    <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-20 shadow-sm">
+                                        <tr class="text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+                                            <th class="px-6 py-4">Informasi Pengguna</th>
+                                            <th class="px-6 py-4">Level Akses</th>
+                                            <th class="px-6 py-4 text-center">Izin Lihat Foto</th>
+                                            <th class="px-6 py-4">Status Akun</th>
+                                            <th class="px-6 py-4">Sesi Perangkat</th>
+                                            <th class="px-6 py-4 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr v-for="u in filteredAdminUsers" :key="u.username" class="hover:bg-slate-50/80 transition-colors group">
+                                            
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-100">
+                                                        {{ (u.nama || u.username || '?').charAt(0).toUpperCase() }}
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <div class="font-bold text-slate-800 text-sm">
+                                                            {{ u.nama || 'Tanpa Nama' }}
+                                                        </div>
+                                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                                                            @{{ u.username }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-6 py-4">
+                                                <div class="relative inline-block w-32">
+                                                    <select v-model="u.role" @change="updateUserRole(u)" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none transition-all">
+                                                        <option value="VIEWER">VIEWER</option>
+                                                        <option value="STAFF">STAFF</option>
+                                                        <option value="MANAGER">MANAGER</option>
+                                                        <option value="ADMIN">ADMIN</option>
+                                                    </select>
+                                                    <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-6 py-4 text-center">
+                                                <label class="relative inline-flex items-center cursor-pointer justify-center">
+                                                    <input type="checkbox" class="sr-only peer" :checked="u.canPreviewPhoto === true || u.canPreviewPhoto === 1" @change="togglePhotoAccess(u, $event.target.checked)">
+                                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                                </label>
+                                            </td>
+
+                                            <td class="px-6 py-4">
+                                                <div v-if="u.status === 'PENDING'" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100 animate-pulse">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i> PENDING
+                                                </div>
+                                                <div v-else class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border" :class="u.status==='AKTIF' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
+                                                    <span class="w-1.5 h-1.5 rounded-full" :class="u.status==='AKTIF' ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                                                    {{ u.status }}
+                                                </div>
+                                            </td>
+
+                                            <td class="px-6 py-4 text-sm text-slate-600">
+                                                <div class="flex items-center gap-2">
+                                                    <i :class="u.deviceInfo?.includes('Android') || u.deviceInfo?.includes('iOS') ? 'fa-mobile-alt' : 'fa-laptop'" class="fa-solid text-slate-400"></i>
+                                                    <span class="text-xs">{{ u.deviceInfo || 'Belum Login' }}</span>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-6 py-4 text-right">
+                                                <div class="flex justify-end items-center gap-2">
+                                                    <template v-if="u.status === 'PENDING'">
+                                                        <button @click="approveUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="Setujui">
+                                                            <i class="fa-solid fa-check"></i>
+                                                        </button>
+                                                        <button @click="deleteUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors" title="Tolak">
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                        </button>
+                                                    </template>
+                                                    <template v-else>
+                                                        <button @click="toggleUser(u)" 
+                                                            :class="u.status==='AKTIF' ? 'text-amber-500 hover:bg-amber-50' : 'text-emerald-500 hover:bg-emerald-50'" 
+                                                            class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+                                                            :title="u.status==='AKTIF' ? 'Suspend User' : 'Aktifkan User'">
+                                                            <i :class="u.status==='AKTIF' ? 'fa-solid fa-ban' : 'fa-solid fa-power-off'"></i>
+                                                        </button>
+                                                        
+                                                        <button @click="deleteUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus User">
+                                                            <i class="fa-solid fa-trash-can"></i>
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </td>
+
+                                        </tr>
                                         
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-100">
-                                                    {{ u.nama.charAt(0).toUpperCase() }}
+                                        <tr v-if="filteredAdminUsers.length === 0">
+                                            <td colspan="6" class="py-20 text-center">
+                                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fa-solid fa-user-slash text-3xl text-slate-300"></i>
                                                 </div>
-                                                <div>
-                                                    <div class="font-bold text-slate-800 text-sm">{{ u.nama }}</div>
-                                                    <div class="text-[11px] font-mono text-slate-400 mt-0.5">@{{ u.username }}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        <td class="px-6 py-4">
-                                            <div class="relative inline-block w-32">
-                                                <select v-model="u.role" @change="updateUserRole(u)" 
-                                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none transition-all">
-                                                    <option value="VIEWER">VIEWER</option>
-                                                    <option value="STAFF">STAFF</option>
-                                                    <option value="MANAGER">MANAGER</option>
-                                                    <option value="ADMIN">ADMIN</option>
-                                                </select>
-                                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
-                                            </div>
-                                        </td>
-
-                                        <td class="px-6 py-4 text-center">
-                                            <label class="relative inline-flex items-center cursor-pointer justify-center">
-                                                <input type="checkbox" class="sr-only peer" 
-                                                    :checked="u.canPreviewPhoto === true || u.canPreviewPhoto === 1"
-                                                    @change="togglePhotoAccess(u, $event.target.checked)">
-                                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                                            </label>
-                                        </td>
-
-                                        <td class="px-6 py-4">
-                                            <div v-if="u.status === 'PENDING'" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100 animate-pulse">
-                                                <i class="fa-solid fa-clock-rotate-left"></i> PENDING
-                                            </div>
-                                            <div v-else class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border"
-                                                :class="u.status==='AKTIF' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
-                                                <span class="w-1.5 h-1.5 rounded-full" :class="u.status==='AKTIF' ? 'bg-emerald-500' : 'bg-rose-500'"></span>
-                                                {{ u.status }}
-                                            </div>
-                                        </td>
-
-                                        <td class="px-6 py-4 text-right">
-                                            <div class="flex justify-end items-center gap-2">
-                                                <template v-if="u.status === 'PENDING'">
-                                                    <button @click="approveUser(u)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all active:scale-95">Setujui</button>
-                                                    <button @click="deleteUser(u)" class="bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold px-4 py-2 rounded-lg transition-all">Tolak</button>
-                                                </template>
-                                                <template v-else>
-                                                    <button @click="toggleUser(u)" 
-                                                        :class="u.status==='AKTIF' ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'" 
-                                                        class="text-xs font-semibold px-4 py-2 rounded-lg transition-all active:scale-95 border border-transparent"
-                                                        :title="u.status==='AKTIF' ? 'Nonaktifkan User' : 'Aktifkan User'">
-                                                        {{ u.status==='AKTIF' ? 'Suspend' : 'Activate' }}
-                                                    </button>
-                                                    <button @click="deleteUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors" title="Hapus User">
-                                                        <i class="fa-solid fa-trash-can"></i>
-                                                    </button>
-                                                </template>
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                    
-                                    <tr v-if="filteredAdminUsers.length === 0">
-                                        <td colspan="5" class="py-20 text-center">
-                                            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <i class="fa-solid fa-user-slash text-3xl text-slate-300"></i>
-                                            </div>
-                                            <h4 class="text-slate-800 font-bold text-sm">User tidak ditemukan</h4>
-                                            <p class="text-slate-400 text-xs mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                <h4 class="text-slate-800 font-bold text-sm">User tidak ditemukan</h4>
+                                                <p class="text-slate-400 text-xs mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="h-10"></div>
                     </div>
@@ -1177,6 +1190,57 @@
 
             </div>
         </template>
+
+        <div v-if="showUserModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform scale-100">
+                <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-blue-600"></i> Tambah User Baru
+                    </h3>
+                    <button @click="closeUserModal" class="text-slate-400 hover:text-rose-500 transition-colors w-8 h-8 rounded-full hover:bg-rose-50 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">Nama Lengkap</label>
+                        <input v-model="newUser.nama" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="Misal: Budi Santoso">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">Username</label>
+                        <input v-model="newUser.username" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="Misal: budi123">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">Password</label>
+                        <input v-model="newUser.password" type="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="Masukkan password kuat">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5">Level Akses (Role)</label>
+                        <div class="relative">
+                            <select v-model="newUser.role" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none appearance-none transition-all cursor-pointer">
+                                <option value="VIEWER">VIEWER</option>
+                                <option value="STAFF">STAFF</option>
+                                <option value="MANAGER">MANAGER</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-5 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50">
+                    <button @click="closeUserModal" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">Batal</button>
+                    <button @click="submitNewUser" :disabled="isSubmitting" class="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                        <i v-if="isSubmitting" class="fa-solid fa-circle-notch fa-spin"></i> 
+                        <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan User' }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div v-if="showItemModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -1489,7 +1553,7 @@
 
     <script>
         const { createApp, ref, computed, onMounted, watch, reactive, nextTick } = Vue;
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwausSoHGOHs-6y_Mzp8dRWko-Hv6cwEWRJKoFEhaMi6Vo6wcRAr5juxgLUjYDIwWLqyw/exec"; // Ganti dengan URL GAS Anda
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyH_tTdU4DSw0T5xI0DgBD23KTHf8zhfmRwheAAbo3WTIs-TlNtHYUuBHNjWXTOgo388g/exec"; // Ganti dengan URL GAS Anda
 
         createApp({
             setup() {
@@ -1504,12 +1568,14 @@
                 const page = ref('dashboard');
                 const sidebarOpen = ref(false);
 
+                const showUserModal = ref(false);
+                const isSubmitting = ref(false);
                 const loginData = ref({ username: '', password: '' });
                 const userData = ref({ username: '', nama: '', role: '', canPreviewPhoto: false });
                 const userToken = ref('');
                 const adminUsers = ref([]);
                 const userSearchQuery = ref('');
-                const newUser = ref({ nama: '', username: '', password: '', role: 'VIEWER' });
+                const newUser = reactive({ nama: '', username: '', password: '', role: 'VIEWER' });
                 const showRegisterModal = ref(false);
                 const regData = ref({ nama: '', username: '', password: '' });
                 const showProfileModal = ref(false);
@@ -1567,31 +1633,89 @@
                 const callAPI = async (action, payload = {}, overrideToken = null) => {
                     loading.value = true;
                     try {
-                        // Gunakan overrideToken jika ada, jika tidak ambil dari localStorage
-                        const token = overrideToken || localStorage.getItem('token');
-                        
                         const response = await fetch(GAS_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'text/plain' },
                             body: JSON.stringify({ 
                                 action, 
-                                token: token, // Kirim token yang sudah pasti ada
+                                token: overrideToken || localStorage.getItem('token'), 
                                 payload 
                             })
                         });
+
                         const res = await response.json();
-                        
-                        // Jika session mati di tengah jalan
+
                         if (res.status === 'error' && res.message === 'INVALID_SESSION') {
-                            handleLogout();
+                            alert("Sesi Anda berakhir karena Anda telah login di perangkat lain.");
+                            handleLogout(); // Otomatis tendang ke halaman login
+                            return res;
                         }
-                        
+                                                                        
                         return res;
                     } catch (e) {
                         console.error("API Error", e);
                         return { status: 'error', message: 'Koneksi gagal' };
                     } finally {
                         loading.value = false;
+                    }
+                };
+
+                const openUserModal = () => {
+                    newUser.nama = '';
+                    newUser.username = '';
+                    newUser.password = '';
+                    newUser.role = 'VIEWER';
+                    showUserModal.value = true;
+                };
+
+                const closeUserModal = () => {
+                    showUserModal.value = false;
+                };
+
+                const submitNewUser = async () => {
+                    if (!newUser.nama || !newUser.username || !newUser.password) {
+                        alert('Harap isi Nama, Username, dan Password!');
+                        return;
+                    }
+
+                    isSubmitting.value = true;
+
+                    try {
+                        // Struktur payload ini harus sesuai dengan case 'ADMIN_MANAGE_USER' di doPost
+                        const requestPayload = {
+                            targetUser: newUser.username,
+                            manageAction: 'ADD',
+                            payload: {
+                                nama: newUser.nama,
+                                password: newUser.password,
+                                role: newUser.role
+                            }
+                        };
+
+                        // Menggunakan callAPI (Pastikan callAPI mengirimkan token di level atas JSON)
+                        const res = await callAPI('ADMIN_MANAGE_USER', requestPayload);
+
+                        if (res && res.status === 'success') {
+                            // Update tabel secara lokal (Optimistic)
+                            adminUsers.value.unshift({ 
+                                nama: newUser.nama, 
+                                username: newUser.username, 
+                                role: newUser.role, 
+                                status: 'AKTIF', 
+                                canPreviewPhoto: false,
+                                deviceInfo: '' 
+                            });
+
+                            closeUserModal();
+                            alert('User berhasil ditambahkan!');
+                        } else {
+                            alert('Gagal: ' + (res?.message || 'Server Error'));
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        alert('Terjadi kesalahan koneksi.');
+                    } finally {
+                        isSubmitting.value = false;
                     }
                 };
 
@@ -1605,26 +1729,80 @@
                 };
 
                 const handleLogin = async () => {
-                    const res = await callAPI('LOGIN', loginData.value);
-                    if (res.status === 'success') {
-                        // 1. Simpan Token
-                        localStorage.setItem('token', res.token);
-                        userToken.value = res.token;
+                    try {
+                        // Ambil info perangkat
+                        const deviceInfo = getDeviceInfo();
+                        
+                        // Kirim username, password, DAN deviceInfo ke backend
+                        const res = await callAPI('LOGIN', {
+                            ...loginData.value,
+                            deviceInfo: deviceInfo
+                        });
 
-                        userData.value = { 
-                            nama: res.nama, 
-                            role: res.role,
-                            canPreviewPhoto: String(res.canPreviewPhoto).toUpperCase() === 'TRUE'
-                        };
+                        if (res.status === 'success') {
+                            // 1. Simpan Token & Update State
+                            localStorage.setItem('token', res.token);
+                            userToken.value = res.token;
 
-                        // 2. Kirim token langsung ke fetchAllData agar tidak INVALID_SESSION
-                        await fetchAllData(res.token);
+                            userData.value = { 
+                                nama: res.nama, 
+                                role: res.role,
+                                // Pastikan konversi boolean aman
+                                canPreviewPhoto: String(res.canPreviewPhoto).toUpperCase() === 'TRUE'
+                            };
 
-                        isLoggedIn.value = true;
-                        page.value = ROLE_LANDING_PAGE[res.role] || 'inventory';
-                    } else { 
-                        alert(res.message); 
+                            // 2. Fetch data awal dengan token baru agar tidak INVALID_SESSION
+                            await fetchAllData(res.token);
+
+                            // 3. Login Berhasil
+                            isLoggedIn.value = true;
+                            page.value = ROLE_LANDING_PAGE[res.role] || 'inventory';
+                            
+                            console.log(`Login sukses dari perangkat: ${deviceInfo}`);
+                        } else { 
+                            alert(res.message); 
+                        }
+                    } catch (err) {
+                        console.error("Login Error:", err);
+                        alert("Terjadi kesalahan koneksi saat login.");
                     }
+                };
+
+                const getDeviceInfo = () => {
+                    const ua = navigator.userAgent;
+                    let device = "Unknown Device";
+                    
+                    // 1. Deteksi Android & Versinya
+                    if (/android/i.test(ua)) {
+                        const match = ua.match(/Android\s([0-9\.]+)/);
+                        const version = match ? match[1] : "";
+                        device = `Android ${version}`;
+                    } 
+                    // 2. Deteksi iOS (iPhone/iPad)
+                    else if (/iPhone|iPad|iPod/i.test(ua)) {
+                        const match = ua.match(/OS\s([0-9\_]+)/);
+                        const version = match ? match[1].replace(/_/g, '.') : "";
+                        const model = /iPhone/.test(ua) ? "iPhone" : "iPad";
+                        device = `${model} (iOS ${version})`;
+                    } 
+                    // 3. Deteksi PC (Windows/Mac/Linux)
+                    else if (/Windows/i.test(ua)) {
+                        const match = ua.match(/Windows\sNT\s([0-9\.]+)/);
+                        let winVer = match ? match[1] : "";
+                        // Mapping versi Windows NT ke versi publik
+                        const winMap = { "10.0": "10/11", "6.3": "8.1", "6.2": "8", "6.1": "7" };
+                        device = `Windows ${winMap[winVer] || winVer}`;
+                    } 
+                    else if (/Macintosh/i.test(ua)) device = "Mac OS";
+                    else if (/Linux/i.test(ua)) device = "Linux PC";
+
+                    // 4. Deteksi Browser
+                    const browser = /Edg/i.test(ua) ? "Edge" :
+                                    /Chrome/i.test(ua) ? "Chrome" : 
+                                    /Safari/i.test(ua) ? "Safari" : 
+                                    /Firefox/i.test(ua) ? "Firefox" : "Browser";
+                    
+                    return `${device} - ${browser}`;
                 };
 
                 const fetchAllData = async () => {
@@ -2455,9 +2633,29 @@
                 });
                 
                 const handleLogout = () => {
-                    localStorage.clear();
+                    // 1. Hapus data dari LocalStorage
+                    localStorage.removeItem('token');
+                    
+                    // 2. Reset semua State Reaktif ke awal
                     isLoggedIn.value = false;
+                    userToken.value = '';
+                    userData.value = { username: '', nama: '', role: '', canPreviewPhoto: false };
                     location.reload();
+                    
+                    // 3. Bersihkan data sensitif dari memori
+                    inventory.value = [];
+                    adminUsers.value = [];
+                    cart.value = [];
+                    
+                    // 4. Hentikan semua interval (jika ada auto-refresh dashboard)
+                    if (dashboardInterval) clearInterval(dashboardInterval);
+                    if (inventoryInterval) clearInterval(inventoryInterval);
+                    
+                    // 5. Arahkan ke halaman dashboard/login
+                    page.value = 'dashboard';
+                    
+                    // Opsional: Berikan notifikasi kecil
+                    console.log("Sesi telah dibersihkan.");
                 };
                 
                 onMounted(async () => {
@@ -2490,10 +2688,10 @@
                 
                 return {
                     isLoggedIn, loading, page, sidebarOpen, scannerActive, showCart, showLowStock, saveNewLocation, removeFromCart, navigate, stockFilter, categoryOptions, categoryFilter,
-                    searchQuery, inventorySearch, showRegisterModal, regData, handleRegister, userRole, showLocationModal, locationForm, openUpdateLocation,
-                    loginData, userData, adminUsers, fetchUsers, approveUser, toggleUser, updateUserRole, deleteUser, userSearchQuery, previewImage, showProfileModal,
+                    searchQuery, inventorySearch, showRegisterModal, regData, handleRegister, userRole, showLocationModal, locationForm, openUpdateLocation, showUserModal, isSubmitting, submitNewUser,
+                    loginData, userData, adminUsers, fetchUsers, approveUser, toggleUser, updateUserRole, deleteUser, userSearchQuery, previewImage, showProfileModal, newUser, openUserModal, 
                     filteredAdminUsers, inventory, recentTx, showItemModal, isEditMode, formItem, openAddModal, editItem, saveItem, toggleStatus, openEditProfile, loadingProfile, profileForm,
-                    cart, dashData, dashFilter, lowStockItems, inputQty, qtyInputRef, searchInputRef, departments, txType, txDept, txNote, searchInMaster, togglePhotoAccess,
+                    cart, dashData, dashFilter, lowStockItems, inputQty, qtyInputRef, searchInputRef, departments, txType, txDept, txNote, searchInMaster, togglePhotoAccess, closeUserModal,
                     handleLogin, handleLogout, fetchDashboard, addToCart, handleScan, processTx, resetTransactionForm, isStockInsufficient, getMasterStock,
                     fixDriveUrl, handleCancelTx, getJenisClass, exportToExcel, focusSearch, addToCartWithQty, isVoided, cancellingId,
                     filteredHistory, searchResults, filteredInventory, openScanner, closeScanner
