@@ -26,6 +26,24 @@
         .sidebar-item-active { background: #4f46e5; color: white; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .toast-samsung-enter-active {
+            transition: all 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        .toast-samsung-leave-active {
+            transition: all 0.3s ease-in;
+        }
+        .toast-samsung-enter-from {
+            opacity: 0;
+            transform: translate(-50%, 40px) scale(0.9);
+        }
+        .toast-samsung-leave-to {
+            opacity: 0;
+            transform: translate(-50%, 20px) scale(0.95);
+        }
+
+        .fade-scale-enter-active, .fade-scale-leave-active { transition: all 0.3s ease; }
+        .fade-scale-enter-from, .fade-scale-leave-to { opacity: 0; transform: scale(0.95); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 overflow-hidden font-sans">
@@ -82,8 +100,18 @@
                         <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                             <i class="fa-solid fa-lock"></i>
                         </div>
-                        <input v-model="loginData.password" @keyup.enter="handleLogin" type="password" placeholder="Password" 
-                            class="w-full pl-12 pr-6 py-4 bg-slate-50 hover:bg-slate-100 focus:bg-white rounded-2xl border border-slate-200 outline-none focus:ring-2 ring-indigo-500 focus:border-transparent transition-all text-sm font-medium text-slate-700 placeholder-slate-400">
+                        <div class="relative">
+                            <input :type="showPass ? 'text' : 'password'" 
+                                v-model="loginData.password" @keyup.enter="handleLogin"
+                                class="w-full pl-12 pr-6 py-4 bg-slate-50 hover:bg-slate-100 focus:bg-white rounded-2xl border border-slate-200 outline-none focus:ring-2 ring-indigo-500 focus:border-transparent transition-all text-sm font-medium text-slate-700 placeholder-slate-400" 
+                                placeholder="Password">
+                            
+                            <button @click="showPass = !showPass" 
+                                    type="button"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition">
+                                <i :class="showPass ? 'fa-eye-slash' : 'fa-eye'" class="fa-solid"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <button @click="handleLogin" 
@@ -503,7 +531,7 @@
                                         ref="qtyInputRef"
                                         @keyup.enter="focusSearch"
                                         type="number" 
-                                        min="1"
+                                        min=""
                                         class="w-full py-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-center text-indigo-600 focus:border-indigo-500 focus:bg-white transition-all outline-none text-lg shadow-inner"
                                     >
                                 </div>
@@ -588,9 +616,11 @@
                         </div>
 
                         <transition name="fade">
-                            <div v-if="showCart" class="fixed inset-0 z-[100] flex items-start justify-center pt-0 lg:pt-10 bg-slate-900/30 backdrop-blur-sm">
+                            <div v-if="showCart"
+                                @click.self="showCart = false" 
+                                class="fixed inset-0 z-[60] flex items-start justify-center pt-0 lg:pt-10 bg-slate-900/30 backdrop-blur-sm">
                                 
-                                <div class="w-full h-full lg:h-auto lg:w-[450px] lg:max-h-[85vh] bg-white lg:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+                                <div class="w-full h-full lg:h-auto lg:w-[750px] lg:max-h-[85vh] bg-white lg:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-100">
                                     
                                     <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-white shadow-sm z-10">
                                         <div class="relative flex items-center">
@@ -732,7 +762,7 @@
                                         ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                                     class="px-5 h-10 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                                    <i class="fa-solid fa-check-circle mr-1"></i> Stock Ready
+                                    <i class="fa-solid fa-check-circle mr-1"></i> Ready
                                 </button>
 
                                 <button 
@@ -741,7 +771,7 @@
                                         ? 'bg-rose-600 text-white shadow-md shadow-rose-200'
                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                                     class="px-5 h-10 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                                    <i class="fa-solid fa-times-circle mr-1"></i> Stock Kosong
+                                    <i class="fa-solid fa-times-circle mr-1"></i> Kosong
                                 </button>
 
                                 <button 
@@ -891,87 +921,187 @@
                 </main>
 
                 <main v-if="page === 'master_barang' && ['ADMIN', 'STAFF'].includes(userData.role)" 
-                      class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
-                    <div class="p-6 bg-white border-b border-slate-200 flex flex-wrap md:flex-row items-center justify-between gap-4">
+                    class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+                    
+                    <div class="p-6 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-4 z-20 shadow-sm relative">
                         <div class="flex-shrink-0">
                             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Master Data Barang</h2>
-                            <p class="text-xs text-slate-400 font-medium">
+                            <p class="text-[11px] text-slate-400 font-medium">
                                 {{ userData.role === 'ADMIN' ? 'Kelola produk dan stok utama' : 'Lihat stok dan perbarui lokasi rak' }}
                             </p>
                         </div>
 
-                        <div class="flex-1 max-w-md relative group">
-                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors"></i>
-                            <input 
-                                v-model="inventorySearch" 
-                                type="text" 
-                                placeholder="Cari Nama Barang, Kode, atau Lokasi..." 
-                                class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
-                            >
+                        <div class="flex-1 flex flex-wrap items-center gap-3 min-w-[300px]">
+                            <div class="relative flex-1 max-w-sm group">
+                                <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors"></i>
+                                <input 
+                                    v-model="inventorySearch" 
+                                    type="text" 
+                                    placeholder="Cari Barang..." 
+                                    class="w-full pl-11 pr-10 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
+                                >
+                                <button v-if="inventorySearch" @click="inventorySearch = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </button>
+                            </div>
+
+                            <div class="relative">
+                                <select v-model="filterLocation" 
+                                        class="appearance-none pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-600 focus:bg-white outline-none cursor-pointer hover:border-indigo-200 transition-all">
+                                    <option value="">Semua Lokasi</option>
+                                    <option v-for="loc in uniqueLocations" :key="loc" :value="loc">{{ loc }}</option>
+                                </select>
+                                <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px] pointer-events-none"></i>
+                            </div>
+
                             <button 
-                                v-if="inventorySearch"
-                                @click="inventorySearch = ''"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500 transition-colors"
+                                v-if="sortKey || filterLocation || inventorySearch"
+                                @click="resetAllFilters"
+                                class="flex items-center gap-2 px-4 py-2.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl text-xs font-bold hover:bg-rose-100 transition-all active:scale-95"
                             >
-                                <i class="fa-solid fa-xmark text-sm"></i>
+                                <i class="fa-solid fa-arrow-rotate-left"></i>
+                                <span></span>
                             </button>
                         </div>
                         
                         <div v-if="userData.role === 'ADMIN'" class="flex-shrink-0">
                             <button 
                                 @click="openAddModal" 
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl text-xs font-bold shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-indigo-100 transition-all active:scale-95 flex items-center gap-2"
                             >
                                 <i class="fa-solid fa-plus"></i>
-                                <span>Tambah</span>
+                                <span>Tambah Barang</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <div v-for="item in searchInMaster" :key="item.kode" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden group hover:border-indigo-300 transition-all">
-                                <div class="h-48 bg-slate-100 relative overflow-hidden">
-                                    <img :src="fixDriveUrl(item.foto)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    <div v-if="item.stok <= item.minStok" class="absolute top-3 left-3 bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-pulse">
-                                        STOCK LOW
-                                    </div>
-                                    <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-bold text-slate-600 shadow-sm">
-                                        {{ item.lokasi }}
-                                    </div>
-                                </div>
+                    <div class="flex-1 p-4 lg:p-6 overflow-hidden flex flex-col">
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm flex-1 flex flex-col overflow-hidden">
+                            <div class="overflow-x-auto overflow-y-auto flex-1 custom-scrollbar">
+                                <table class="w-full text-left border-collapse whitespace-nowrap min-w-[900px]">
+                                    <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-16">Foto</th>
+                                            
+                                            <th @click="sortBy('kode')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Kode
+                                                    <i v-if="sortKey === 'kode'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
 
-                                <div class="p-4">
-                                    <div class="flex justify-between items-start mb-1">
-                                        <h3 class="font-bold text-slate-700 leading-tight truncate mr-2">{{ item.nama }}</h3>
-                                        <span class="text-[10px] font-mono text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{{ item.kode }}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-400 mb-4">{{ item.satuan }}</p>
+                                            <th @click="sortBy('nama')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Nama Barang
+                                                    <i v-if="sortKey === 'nama'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
+
+                                            <th @click="sortBy('satuan')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Satuan
+                                                    <i v-if="sortKey === 'satuan'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
+
+                                            <th @click="sortBy('lokasi')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Lokasi Rak
+                                                    <i v-if="sortKey === 'lokasi'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
+
+                                            <th @click="sortBy('stok')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Stok
+                                                    <i v-if="sortKey === 'stok'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
+
+                                            <th @click="sortBy('minStok')" class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
+                                                <div class="flex items-center gap-2">
+                                                    Min. Stok
+                                                    <i v-if="sortKey === 'minStok'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                                    <i v-else class="fa-solid fa-sort text-slate-300 group-hover:text-slate-400"></i>
+                                                </div>
+                                            </th>
+
+                                            <th class="px-5 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Action</th>
+                                        </tr>
+                                    </thead>
                                     
-                                    <div class="flex items-center justify-between border-t pt-4">
-                                        <div>
-                                            <p class="text-[10px] text-slate-400 font-bold uppercase">Stok Saat Ini</p>
-                                            <p class="text-lg font-black text-slate-800">{{ item.stok }}</p>
-                                        </div>
-                                        
-                                        <div class="flex gap-2">
-                                            <template v-if="userData.role === 'ADMIN'">
-                                                <button @click="editItem(item)" class="p-2.5 bg-slate-50 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button @click="toggleStatus(item)" :class="item.status === 'AKTIF' ? 'text-emerald-500 bg-emerald-50' : 'text-slate-300 bg-slate-100'" class="p-2.5 rounded-xl transition-colors">
-                                                    <i class="fa-solid fa-power-off"></i>
-                                                </button>
-                                            </template>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr v-for="item in sortedMaster" :key="item.kode" class="hover:bg-slate-50/70 transition-colors group">
+                                            
+                                            <td class="px-5 py-3">
+                                                <div @click="previewImage = fixDriveUrl(item.foto)" 
+                                                    class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500 hover:opacity-80 transition-all">
+                                                    <img :src="fixDriveUrl(item.foto)" class="w-full h-full object-cover">
+                                                </div>
+                                            </td>
 
-                                            <template v-if="userData.role === 'STAFF'">
-                                                <button @click="openUpdateLocation(item)" class="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-colors">
-                                                    <i class="fa-solid fa-location-dot"></i>
-                                                    Update Lokasi
-                                                </button>
-                                            </template>
-                                        </div>
-                                    </div>
+                                            <td class="px-5 py-3">
+                                                <span class="text-[11px] font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">{{ item.kode }}</span>
+                                            </td>
+
+                                            <td class="px-5 py-3">
+                                                <div class="flex flex-col">
+                                                    <span class="font-bold text-slate-700 text-sm">{{ item.nama }}</span>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-5 py-3 text-sm text-slate-500 font-medium">{{ item.satuan }}</td>
+
+                                            <td class="px-5 py-3">
+                                                <span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-[11px] font-bold rounded-lg border border-slate-200">{{ item.lokasi }}</span>
+                                            </td>
+
+                                            <td class="px-5 py-3">
+                                                <span class="text-base font-black px-3 py-1 rounded-lg" 
+                                                    :class="Number(item.stok) <= Number(item.minStok) ? 'text-rose-600 bg-rose-50 border border-rose-100' : 'text-slate-800'">
+                                                    {{ item.stok }}
+                                                </span>
+                                                <i v-if="Number(item.stok) <= Number(item.minStok)" class="fa-solid fa-triangle-exclamation text-rose-500 ml-2 animate-pulse text-xs" title="Stok Menipis"></i>
+                                            </td>
+
+                                            <td class="px-5 py-3">
+                                                <span class="text-sm font-bold text-slate-400">{{ item.minStok }}</span>
+                                            </td>
+
+                                            <td class="px-5 py-3">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <template v-if="userData.role === 'ADMIN'">
+                                                        <button @click="editItem(item)" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 rounded-lg transition-all shadow-sm" title="Edit Barang">
+                                                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                                        </button>
+                                                        <button @click="toggleStatus(item)" 
+                                                                :class="item.status === 'AKTIF' ? 'text-emerald-500 hover:bg-emerald-50 hover:border-emerald-200' : 'text-slate-400 hover:bg-slate-100'" 
+                                                                class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg transition-all shadow-sm"
+                                                                :title="item.status === 'AKTIF' ? 'Non-aktifkan' : 'Aktifkan'">
+                                                            <i class="fa-solid fa-power-off text-xs"></i>
+                                                        </button>
+                                                    </template>
+
+                                                    <template v-if="userData.role === 'STAFF'">
+                                                        <button @click="openUpdateLocation(item)" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg font-bold text-xs hover:bg-emerald-100 transition-colors flex items-center gap-1.5 shadow-sm">
+                                                            <i class="fa-solid fa-location-dot"></i> Update
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div v-if="searchInMaster.length === 0" class="flex flex-col items-center justify-center py-16 text-slate-400">
+                                    <i class="fa-solid fa-box-open text-5xl mb-4 text-slate-200"></i>
+                                    <p class="text-sm font-medium">Barang tidak ditemukan</p>
                                 </div>
                             </div>
                         </div>
@@ -1080,9 +1210,9 @@
                                 <table class="w-full text-left border-collapse min-w-[900px]">
                                     <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-20 shadow-sm">
                                         <tr class="text-[11px] uppercase tracking-wider font-semibold text-slate-500">
-                                            <th class="px-6 py-4">Informasi Pengguna</th>
+                                            <th class="px-6 py-4">User Name</th>
                                             <th class="px-6 py-4">Level Akses</th>
-                                            <th class="px-6 py-4 text-center">Izin Lihat Foto</th>
+                                            <th class="px-6 py-4 text-center">Access Photo</th>
                                             <th class="px-6 py-4">Status Akun</th>
                                             <th class="px-6 py-4">Sesi Perangkat</th>
                                             <th class="px-6 py-4 text-right">Aksi</th>
@@ -1533,21 +1663,45 @@
             </div>
         </transition>
 
-        <div v-if="previewImage" 
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-            @click="previewImage = null">
-            
-            <div class="relative max-w-4xl w-full p-6 animate-zoom-in" @click.stop>
+        <transition name="toast-samsung">
+            <div v-if="toast.show" 
+                class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[999] w-[90%] max-w-xs md:max-w-sm">
+                <div :class="toast.type === 'success' ? 'bg-slate-800/95' : 'bg-rose-600/95'"
+                    class="backdrop-blur-md border border-white/10 shadow-2xl rounded-2xl px-5 py-3 flex items-center gap-3">
+                    
+                    <div class="flex-shrink-0">
+                        <i v-if="toast.type === 'success'" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                        <i v-else class="fa-solid fa-circle-exclamation text-white text-lg"></i>
+                    </div>
+
+                    <div class="flex-1 text-white text-[13px] font-medium leading-tight">
+                        {{ toast.message }}
+                    </div>
+
+                    <button @click="toast.show = false" class="text-white/40 hover:text-white transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        </transition>
+
+        <transition name="fade-scale">
+            <div v-if="previewImage" 
+                class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-md"
+                @click="previewImage = null">
+                
                 <button @click="previewImage = null" 
-                        class="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
+                        class="absolute top-6 right-6 md:top-8 md:right-8 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-rose-500 text-white/70 hover:text-white rounded-full backdrop-blur-sm border border-white/20 transition-all duration-300 shadow-2xl z-10">
+                    <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
 
-                <img :src="previewImage" 
-                    class="w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl shadow-black/50"
-                    alt="Preview">
+                <div class="relative max-w-4xl w-[90%] md:w-auto p-2 bg-white/5 rounded-3xl shadow-2xl border border-white/10" @click.stop>
+                    <img :src="previewImage" 
+                        class="w-full h-auto max-h-[80vh] md:max-h-[85vh] object-contain rounded-2xl shadow-inner"
+                        alt="Preview Foto Barang">
+                </div>
             </div>
-        </div>
+        </transition>
 
     </div>
 
@@ -1599,7 +1753,7 @@
                 const txType = ref('KELUAR');
                 const txDept = ref('');
                 const txNote = ref('');
-                const inputQty = ref(1);
+                const inputQty = ref('');
 
                 const qtyInputRef = ref(null);
                 const searchInputRef = ref(null);
@@ -1625,6 +1779,15 @@
 
                 const searchQuery = ref('');
                 const userRole = ref('ADMIN');
+                const toast = ref({
+                    show: false,
+                    message: '',
+                    type: 'success'
+                });
+                const filterLocation = ref('');
+                const sortKey = ref('');
+                const sortOrder = ref(1);
+                const showPass = ref(false);
 
                 let html5QrCode = null;
                 let dashboardInterval = null;
@@ -1720,51 +1883,75 @@
                 };
 
                 const handleRegister = async () => {
-                    const res = await callAPI('REGISTER', regData.value);
-                    if (res.status === 'success') {
-                        alert("Pendaftaran berhasil! Tunggu approval Admin.");
-                        showRegisterModal.value = false;
-                        regData.value = { nama: '', username: '', password: '' };
-                    } else { alert(res.message); }
+                    if (!regData.value.nama || !regData.value.username || !regData.value.password) {
+                        showToast("Harap isi semua bidang pendaftaran!", "error");
+                        return;
+                    }
+
+                    loading.value = true;
+
+                    try {
+                        const res = await callAPI('REGISTER', regData.value);
+
+                        if (res.status === 'success') {
+                            showToast("Pendaftaran berhasil! Tunggu approval Vickey.", "success");
+
+                            showRegisterModal.value = false;
+                            regData.value = { nama: '', username: '', password: '' };
+                        } else {
+                            showToast(res.message, "error");
+                        }
+                    } catch (err) {
+                        console.error("Reg Error:", err);
+                        showToast("Terjadi kesalahan koneksi. Silakan coba lagi.", "error");
+                    } finally {
+                        loading.value = false;
+                    }
                 };
 
                 const handleLogin = async () => {
+                    if (!loginData.value.username || !loginData.value.password) {
+                        showToast("Username dan password harus diisi!", "error");
+                        return;
+                    }
+
+                    loading.value = true;
+
                     try {
-                        // Ambil info perangkat
                         const deviceInfo = getDeviceInfo();
-                        
-                        // Kirim username, password, DAN deviceInfo ke backend
                         const res = await callAPI('LOGIN', {
                             ...loginData.value,
                             deviceInfo: deviceInfo
                         });
 
                         if (res.status === 'success') {
-                            // 1. Simpan Token & Update State
+                            // 1. Simpan Token & Update State Global
                             localStorage.setItem('token', res.token);
                             userToken.value = res.token;
 
                             userData.value = { 
                                 nama: res.nama, 
                                 role: res.role,
-                                // Pastikan konversi boolean aman
                                 canPreviewPhoto: String(res.canPreviewPhoto).toUpperCase() === 'TRUE'
                             };
 
-                            // 2. Fetch data awal dengan token baru agar tidak INVALID_SESSION
                             await fetchAllData(res.token);
 
-                            // 3. Login Berhasil
                             isLoggedIn.value = true;
                             page.value = ROLE_LANDING_PAGE[res.role] || 'inventory';
-                            
-                            console.log(`Login sukses dari perangkat: ${deviceInfo}`);
+
+                            showToast(`Selamat datang, ${res.nama}!`, "success");
+ 
+                            loginData.value = { username: '', password: '' };
+
                         } else { 
-                            alert(res.message); 
+                            showToast(res.message, "error"); 
                         }
                     } catch (err) {
                         console.error("Login Error:", err);
-                        alert("Terjadi kesalahan koneksi saat login.");
+                        showToast("Terjadi kesalahan koneksi saat login.", "error");
+                    } finally {
+                        loading.value = false;
                     }
                 };
 
@@ -1980,6 +2167,24 @@
                     }
                 });
 
+                const showToast = (msg, type = 'success') => {
+                    // Reset jika toast sedang tampil agar animasi terulang
+                    toast.value.show = false;
+                    
+                    setTimeout(() => {
+                        toast.value = {
+                            show: true,
+                            message: msg,
+                            type: type
+                        };
+                    }, 10);
+
+                    // Otomatis tutup setelah 3 detik
+                    setTimeout(() => {
+                        toast.value.show = false;
+                    }, 3000);
+                };
+
                 const navigate = (target) => {
                     page.value = target
                     sidebarOpen.value = false
@@ -2004,82 +2209,84 @@
                 };
 
                 const processTx = async () => {
-                    // 1. Validasi Dasar
-                    if (cart.value.length === 0) {
-                        alert("Keranjang masih kosong!");
-                        return;
+                    // 1. Validasi Dasar & Guard Clauses
+                    if (cart.value.length === 0) return alert("Keranjang masih kosong!");
+
+                    // Validasi Departemen hanya jika tipe adalah KELUAR, MASUK, atau RETURN (sesuaikan kebutuhan)
+                    // OPNAME biasanya tidak butuh departemen
+                    if (txType.value !== 'OPNAME' && (!txDept.value || !isDeptValid.value)) {
+                        return alert("Departemen tujuan tidak valid atau belum dipilih!");
                     }
 
-                    if (txType.value === 'KELUAR' && (!txDept.value || !isDeptValid.value)) {
-                        alert("Departemen tujuan tidak valid atau belum dipilih!");
-                        return;
-                    }
-
-                    // 2. Validasi Stok (khusus keluar)
+                    // 2. Validasi Stok (khusus KELUAR)
                     if (txType.value === 'KELUAR') {
-                        const invalid = [];
-                        cart.value.forEach(cartItem => {
-                            const master = inventory.value.find(i => i.kode === cartItem.kode);
-                            const currentStock = master ? Number(master.stok) : 0;
-                            if (Number(cartItem.qty) > currentStock) {
-                                invalid.push(`${cartItem.nama} (stok ${currentStock})`);
-                            }
-                        });
+                        const invalid = cart.value
+                            .map(cartItem => {
+                                const master = inventory.value.find(i => i.kode === cartItem.kode);
+                                const currentStock = master ? Number(master.stok) : 0;
+                                return Number(cartItem.qty) > currentStock 
+                                    ? `${cartItem.nama} (Stok: ${currentStock})` 
+                                    : null;
+                            })
+                            .filter(msg => msg !== null);
 
                         if (invalid.length) {
-                            alert("Stok tidak mencukupi:\n\n" + invalid.join('\n'));
-                            return;
+                            return alert("Stok tidak mencukupi:\n\n" + invalid.join('\n'));
                         }
                     }
 
                     if (!confirm(`Proses ${txType.value} ${cart.value.length} item?`)) return;
 
-                    // 3. Persiapan Payload
-                    const payload = {
-                        jenis: txType.value,
-                        dept: txDept.value || '-',
-                        user: userData.value.nama || 'System',
-                        ket: txNote.value || '-',
-                        items: cart.value.map(i => ({
-                            kode: i.kode,
-                            nama: i.nama,
-                            qty: Number(i.qty) // Pastikan angka
-                        }))
-                    };
-
+                    // 3. Eksekusi API
+                    loading.value = true; // Aktifkan UI Loading One UI Anda
+                    
                     try {
+                        const payload = {
+                            jenis: txType.value,
+                            dept: txDept.value || '-',
+                            user: userData.value.nama || 'System',
+                            ket: txNote.value || '-',
+                            items: cart.value.map(i => ({
+                                kode: i.kode,
+                                nama: i.nama,
+                                qty: Number(i.qty)
+                            }))
+                        };
+
                         const res = await callAPI('PROSES_TRANSAKSI_MULTI', payload);
 
                         if (res.status === 'success') {
-                            // 🔥 UPDATE STOK FRONTEND REALTIME (Robust Version)
+                            // 🔥 UPDATE STOK LOKAL (Optimistic Update)
+                            // Ini membuat aplikasi terasa instan tanpa menunggu fetch inventory selesai
                             cart.value.forEach(item => {
                                 const inv = inventory.value.find(i => i.kode === item.kode);
-                                if (!inv) return;
-
-                                const changeQty = Number(item.qty);
-                                const currentInvStok = Number(inv.stok);
-
-                                if (txType.value === 'KELUAR') {
-                                    inv.stok = currentInvStok - changeQty;
-                                } else if (txType.value === 'MASUK' || txType.value === 'RETURN') {
-                                    inv.stok = currentInvStok + changeQty;
-                                } else if (txType.value === 'OPNAME') {
-                                    inv.stok = changeQty; // Stok menjadi angka fisik
+                                if (inv) {
+                                    const qty = Number(item.qty);
+                                    const current = Number(inv.stok);
+                                    if (txType.value === 'KELUAR') inv.stok = current - qty;
+                                    else if (txType.value === 'OPNAME') inv.stok = qty;
+                                    else inv.stok = current + qty; // MASUK & RETURN
                                 }
                             });
 
-                            alert("✅ " + res.message);
-                            resetTransactionForm();
+                            showToast("Transaksi Berhasil!", "success");
+                            resetTransactionForm(); // Menutup modal keranjang
                             
-                            // Refresh dashboard untuk update chart/stat
-                            await fetchDashboard();
-                            await fetchInventory();
+                            // 4. Background Sync (Update data tanpa memblokir user)
+                            // Menggunakan Promise.all agar berjalan berbarengan (lebih cepat)
+                            Promise.all([
+                                fetchDashboard(),
+                                fetchInventory()
+                            ]).catch(e => console.error("Sync Error:", e));
+
                         } else {
-                            alert("❌ " + res.message);
+                            showToast(res.message, "error");
                         }
                     } catch (err) {
                         console.error("Tx Error:", err);
-                        alert("Terjadi kesalahan koneksi ke server.");
+                        showToast("Koneksi bermasalah", "error");
+                    } finally {
+                        loading.value = false; // Matikan loading screen
                     }
                 };
 
@@ -2278,6 +2485,32 @@
                 const isVoided = (tx) => {
                     const ketString = String(tx.ket || '').toUpperCase();
                     return ketString.includes('[DIBATALKAN]');
+                };
+
+                const sortBy = (key) => {
+                    if (sortKey.value === key) {
+                        if (sortOrder.value === 1) {
+                            // Jika sedang Asc, ubah ke Desc
+                            sortOrder.value = -1;
+                        } else {
+                            // Jika sedang Desc, matikan sortir (Reset)
+                            sortKey.value = '';
+                            sortOrder.value = 1;
+                            showToast("Urutan dikembalikan ke asli", "success");
+                        }
+                    } else {
+                        // Klik kolom baru
+                        sortKey.value = key;
+                        sortOrder.value = 1;
+                    }
+                };
+
+                const resetAllFilters = () => {
+                    inventorySearch.value = '';
+                    filterLocation.value = '';
+                    sortKey.value = '';
+                    sortOrder.value = 1;
+                    showToast("Filter dibersihkan", "success");
                 };
 
                 const openAddModal = () => {
@@ -2557,6 +2790,57 @@
                     return [...new Set(categories)]
                 });
 
+                const uniqueLocations = computed(() => {
+                    if (!inventory.value) return [];
+                    
+                    const areas = inventory.value.map(item => {
+                        const loc = String(item.lokasi || '');
+                        if (loc.includes('-')) {
+                            // Ambil teks sebelum strip dan hapus spasi kosong
+                            return loc.split('-')[0].trim();
+                        }
+                        return loc.trim();
+                    }).filter(Boolean);
+
+                    // Ambil nilai unik dan urutkan
+                    return [...new Set(areas)].sort();
+                });
+
+                const sortedMaster = computed(() => {
+                    let data = inventory.value ? [...inventory.value] : [];
+
+                    // Filter berdasarkan Pencarian Teks
+                    if (inventorySearch.value) {
+                        const s = inventorySearch.value.toLowerCase();
+                        data = data.filter(i => 
+                            i.nama.toLowerCase().includes(s) || 
+                            i.kode.toLowerCase().includes(s) || 
+                            i.lokasi.toLowerCase().includes(s)
+                        );
+                    }
+
+                    // Filter berdasarkan Lokasi Rak
+                    if (filterLocation.value) {
+                        data = data.filter(i => {
+                            const areaName = String(i.lokasi || '').split('-')[0].trim();
+                            return areaName === filterLocation.value;
+                        });
+                    }
+
+                    // Logika Sorting (Tetap seperti sebelumnya)
+                    if (sortKey.value) {
+                        data.sort((a, b) => {
+                            let valA = a[sortKey.value];
+                            let valB = b[sortKey.value];
+                            if (sortKey.value === 'stok' || sortKey.value === 'minStok') {
+                                return (Number(valA) - Number(valB)) * sortOrder.value;
+                            }
+                            return String(valA).localeCompare(String(valB)) * sortOrder.value;
+                        });
+                    }
+                    return data;
+                });
+
                 const searchResults = computed(() => {
                     if (!searchQuery.value) return [];
                     const q = searchQuery.value.toLowerCase();
@@ -2692,8 +2976,8 @@
                     loginData, userData, adminUsers, fetchUsers, approveUser, toggleUser, updateUserRole, deleteUser, userSearchQuery, previewImage, showProfileModal, newUser, openUserModal, 
                     filteredAdminUsers, inventory, recentTx, showItemModal, isEditMode, formItem, openAddModal, editItem, saveItem, toggleStatus, openEditProfile, loadingProfile, profileForm,
                     cart, dashData, dashFilter, lowStockItems, inputQty, qtyInputRef, searchInputRef, departments, txType, txDept, txNote, searchInMaster, togglePhotoAccess, closeUserModal,
-                    handleLogin, handleLogout, fetchDashboard, addToCart, handleScan, processTx, resetTransactionForm, isStockInsufficient, getMasterStock,
-                    fixDriveUrl, handleCancelTx, getJenisClass, exportToExcel, focusSearch, addToCartWithQty, isVoided, cancellingId,
+                    handleLogin, handleLogout, fetchDashboard, addToCart, handleScan, processTx, resetTransactionForm, isStockInsufficient, getMasterStock, sortKey, sortOrder, sortBy, sortedMaster,
+                    fixDriveUrl, handleCancelTx, getJenisClass, exportToExcel, focusSearch, addToCartWithQty, isVoided, cancellingId, toast, showPass, filterLocation, uniqueLocations, resetAllFilters,
                     filteredHistory, searchResults, filteredInventory, openScanner, closeScanner
                 };
             }
