@@ -144,7 +144,7 @@
             </div>
 
             <div v-if="showRegisterModal" 
-                class="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+                class="fixed inset-0 z-[50] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
                 
                 <div class="bg-[#F4F7FB] w-full max-w-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] transform transition-all relative overflow-hidden border border-white">
                     
@@ -242,13 +242,12 @@
             ></div>
 
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" 
-                class="fixed lg:static inset-y-0 left-0 z-50 w-72 h-screen bg-gradient-to-b from-[#0B1120] via-[#0D1425] to-[#0A0F1C] text-slate-300 transition-transform duration-300 flex flex-col border-r border-slate-800/50 shadow-[4px_0_24px_rgba(0,0,0,0.2)] select-none">
+                class="fixed lg:static inset-y-0 left-0 z-50 w-72 h-[100dvh] bg-gradient-to-b from-[#0B1120] via-[#0D1425] to-[#0A0F1C] text-slate-300 transition-transform duration-300 flex flex-col border-r border-slate-800/50 shadow-[4px_0_24px_rgba(0,0,0,0.2)] select-none">
 
                 <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/60 shrink-0 relative overflow-hidden">
                     <div class="absolute top-0 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
                     <div class="flex items-center gap-3 relative z-10">
-                        <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 border border-white/10">
+                        <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg border border-white/10">
                             <i class="fa-solid fa-cube text-lg"></i>
                         </div>
                         <div>
@@ -263,7 +262,7 @@
                     </button>
                 </div>
 
-                <nav class="flex-1 overflow-y-auto flex flex-col gap-2 px-4 mt-6 custom-scrollbar relative z-10">
+                <nav class="flex-1 overflow-y-auto min-h-0 flex flex-col gap-2 px-4 mt-4 mb-4 custom-scrollbar relative z-10">
                     
                     <button v-if="['ADMIN', 'STAFF', 'MANAGER'].includes(userData.role)"
                         @click="navigate('dashboard'); sidebarOpen = false"
@@ -317,29 +316,27 @@
                     </button>
                 </nav>
 
-                <div class="p-4 mt-auto border-t border-slate-800/60 bg-gradient-to-t from-[#050810] to-transparent relative z-10">
-                    <div v-if="isLoggedIn" class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/40 border border-slate-700/50 shadow-lg backdrop-blur-sm transition-all duration-300">
+                <div class="shrink-0 p-4 border-t border-slate-800/60 bg-[#0A0F1C]/95 backdrop-blur-md relative z-20">
+                    <div v-if="isLoggedIn" class="flex items-center justify-between p-2 rounded-2xl bg-slate-800/40 border border-slate-700/50 shadow-lg transition-all duration-300">
                         
                         <div @click="openEditProfile" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer group px-1">
-                            
-                            <div class="relative flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-white font-bold shadow-inner border border-blue-400/20 group-hover:scale-105 transition-transform duration-300">
+                            <div class="relative flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-white font-bold shadow-inner border border-blue-400/20 group-hover:scale-105 transition-transform duration-300">
                                 {{ userData?.nama ? userData.nama.substring(0,2).toUpperCase() : '??' }}
                             </div>
                             
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
-                                    <p class="text-sm font-bold text-slate-100 truncate group-hover:text-blue-400 transition-colors">
+                                    <p class="text-xs font-bold text-slate-100 truncate group-hover:text-blue-400 transition-colors">
                                         {{ userData?.nama || 'User' }}
                                     </p>
-                                    <i class="fa-solid fa-pen-to-square text-[10px] text-slate-500 group-hover:text-blue-400 transition-colors lg:opacity-0 lg:group-hover:opacity-100"></i>
                                 </div>
-                                <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">
+                                <p class="text-[9px] font-medium text-slate-500 uppercase tracking-widest mt-0.5">
                                     {{ userData?.role || 'GUEST' }}
                                 </p>
                             </div>
                         </div>
 
-                        <button @click="handleLogout" title="Logout" class="flex-shrink-0 ml-2 p-3 text-slate-400 hover:text-white hover:bg-rose-500/90 rounded-xl transition-all duration-300 focus:outline-none active:scale-95">
+                        <button @click="handleLogout" title="Logout" class="flex-shrink-0 ml-1 p-2.5 text-slate-400 hover:text-white hover:bg-rose-500/90 rounded-xl transition-all duration-300 focus:outline-none active:scale-95">
                             <i class="fa-solid fa-power-off text-sm"></i>
                         </button>
                         
@@ -575,7 +572,7 @@
                     </div>
                 </main>
 
-                <main v-if="page === 'transaksi'" class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+                <main v-if="page === 'transaksi' && ['ADMIN', 'STAFF'].includes(userData.role)" class="flex-1 flex flex-col overflow-hidden bg-slate-50">
                     <div class="p-4 md:p-6 border-b bg-white shadow-sm z-10">
                         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-3 md:gap-4 md:items-end">
                             <div class="w-full md:w-32">
@@ -848,13 +845,21 @@
                                 <input v-model="inventorySearch" 
                                     type="text" 
                                     placeholder="Cari Kode atau Nama Barang..." 
-                                    class="w-full pl-11 pr-10 py-3 rounded-xl bg-white border border-slate-200 shadow-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium transition-all text-slate-700 text-sm">
+                                    class="w-full pl-11 pr-24 py-3 rounded-xl bg-white border border-slate-200 shadow-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium transition-all text-slate-700 text-sm">
                                 
-                                <button v-if="inventorySearch" 
+                                <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                    <button v-if="inventorySearch" 
                                         @click="inventorySearch = ''" 
-                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors p-1 rounded-full hover:bg-slate-100">
-                                    <i class="fa-solid fa-xmark text-lg"></i>
-                                </button>
+                                        class="text-slate-300 hover:text-slate-500 p-1.5 rounded-full hover:bg-slate-100 transition-colors">
+                                        <i class="fa-solid fa-xmark text-lg"></i>
+                                    </button>
+
+                                    <button @click="startScanner" 
+                                        class="flex items-center justify-center bg-indigo-50 text-indigo-600 p-2 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-100"
+                                        title="Scan Barcode">
+                                        <i class="fa-solid fa-barcode text-lg"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="w-full sm:w-auto relative">
@@ -1047,11 +1052,10 @@
                                                 </div>
                                             </th>
 
-                                            <th @click="sortBy('nama')"
-                                                class="px-5 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-indigo-600 transition-colors group">
-                                                <div class="flex items-center gap-2">Nama Barang
-                                                    <i v-if="sortKey === 'nama'" class="fa-solid"
-                                                        :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
+                                            <th @click="sortBy('nama')" class="px-5 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-indigo-600 w-[500px] min-w-[500px]">
+                                                <div class="flex items-center gap-2">
+                                                    NAMA BARANG
+                                                    <i v-if="sortKey === 'nama'" class="fa-solid" :class="sortOrder === 1 ? 'fa-sort-up text-indigo-500' : 'fa-sort-down text-indigo-500'"></i>
                                                     <i v-else class="fa-solid fa-sort text-slate-200 group-hover:text-indigo-300"></i>
                                                 </div>
                                             </th>
@@ -1114,8 +1118,12 @@
                                                     item.kode }}</span>
                                             </td>
 
-                                            <td class="px-5 py-3">
-                                                <span class="font-black text-slate-700 text-sm tracking-tight">{{ item.nama }}</span>
+                                            <td class="px-5 py-4 w-[500px] min-w-[500px]">
+                                                <div class="flex flex-col">
+                                                    <span class="font-bold text-slate-700 text-[13px] leading-relaxed whitespace-normal break-words block">
+                                                        {{ item.nama }}
+                                                    </span>
+                                                </div>
                                             </td>
 
                                             <td class="px-5 py-3">
@@ -1288,113 +1296,163 @@
 
                     <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
                         
-                        <div class="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden">
-                            <div class="overflow-auto w-full max-h-[900px] custom-scrollbar">
-                                <table class="w-full text-left border-collapse min-w-[900px]">
-                                    <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-20 shadow-sm">
-                                        <tr class="text-[11px] uppercase tracking-wider font-semibold text-slate-500">
-                                            <th class="px-6 py-4">User Name</th>
-                                            <th class="px-6 py-4">Level Akses</th>
-                                            <th class="px-6 py-4 text-center">Access Photo</th>
-                                            <th class="px-6 py-4">Status Akun</th>
-                                            <th class="px-6 py-4">Sesi Perangkat</th>
-                                            <th class="px-6 py-4 text-right">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        <tr v-for="u in filteredAdminUsers" :key="u.username" class="hover:bg-slate-50/80 transition-colors group">
-                                            
-                                            <td class="px-6 py-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-100">
-                                                        {{ (u.nama || u.username || '?').charAt(0).toUpperCase() }}
-                                                    </div>
-                                                    
-                                                    <div>
-                                                        <div class="font-bold text-slate-800 text-sm">
-                                                            {{ u.nama || 'Tanpa Nama' }}
+                        <div v-if="filteredAdminUsers.filter(u => u.status === 'PENDING').length > 0" class="mb-10 animate-fade-in">
+                            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                                <i class="fa-solid fa-bell text-amber-500 animate-bounce"></i> Menunggu Persetujuan
+                                <span class="bg-amber-100 text-amber-700 py-0.5 px-2.5 rounded-full text-[10px] font-black">{{ filteredAdminUsers.filter(u => u.status === 'PENDING').length }} Baru</span>
+                            </h3>
+                            
+                            <div class="bg-white rounded-3xl border border-amber-200 shadow-[0_8px_30px_rgba(245,158,11,0.06)] overflow-hidden">
+                                <div class="overflow-auto w-full max-h-[400px] custom-scrollbar">
+                                    <table class="w-full text-left border-collapse min-w-[900px]">
+                                        <thead class="bg-amber-50/50 border-b border-amber-100 sticky top-0 z-20">
+                                            <tr class="text-[11px] uppercase tracking-wider font-bold text-amber-700/70">
+                                                <th class="px-6 py-4">User Name</th>
+                                                <th class="px-6 py-4">Level Akses</th>
+                                                <th class="px-6 py-4">Status Akun</th>
+                                                <th class="px-6 py-4">Sesi Perangkat</th>
+                                                <th class="px-6 py-4 text-right">Aksi Persetujuan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-amber-50">
+                                            <tr v-for="u in filteredAdminUsers.filter(u => u.status === 'PENDING')" :key="'pending-'+u.username" class="hover:bg-amber-50/30 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm border border-amber-200">
+                                                            {{ (u.nama || u.username || '?').charAt(0).toUpperCase() }}
                                                         </div>
-                                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
-                                                            @{{ u.username }}
+                                                        <div>
+                                                            <div class="font-bold text-slate-800 text-sm">{{ u.nama || 'Tanpa Nama' }}</div>
+                                                            <div class="text-[11px] font-mono text-slate-400 mt-0.5">@{{ u.username }}</div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-6 py-4">
-                                                <div class="relative inline-block w-32">
-                                                    <select v-model="u.role" @change="updateUserRole(u)" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none transition-all">
-                                                        <option value="VIEWER">VIEWER</option>
-                                                        <option value="STAFF">STAFF</option>
-                                                        <option value="MANAGER">MANAGER</option>
-                                                        <option value="ADMIN">ADMIN</option>
-                                                    </select>
-                                                    <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-6 py-4 text-center">
-                                                <label class="relative inline-flex items-center cursor-pointer justify-center">
-                                                    <input type="checkbox" class="sr-only peer" :checked="u.canPreviewPhoto === true || u.canPreviewPhoto === 1" @change="togglePhotoAccess(u, $event.target.checked)">
-                                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                                                </label>
-                                            </td>
-
-                                            <td class="px-6 py-4">
-                                                <div v-if="u.status === 'PENDING'" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100 animate-pulse">
-                                                    <i class="fa-solid fa-clock-rotate-left"></i> PENDING
-                                                </div>
-                                                <div v-else class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border" :class="u.status==='AKTIF' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
-                                                    <span class="w-1.5 h-1.5 rounded-full" :class="u.status==='AKTIF' ? 'bg-emerald-500' : 'bg-rose-500'"></span>
-                                                    {{ u.status }}
-                                                </div>
-                                            </td>
-
-                                            <td class="px-6 py-4 text-sm text-slate-600">
-                                                <div class="flex items-center gap-2">
-                                                    <i :class="u.deviceInfo?.includes('Android') || u.deviceInfo?.includes('iOS') ? 'fa-mobile-alt' : 'fa-laptop'" class="fa-solid text-slate-400"></i>
-                                                    <span class="text-xs">{{ u.deviceInfo || 'Belum Login' }}</span>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-6 py-4 text-right">
-                                                <div class="flex justify-end items-center gap-2">
-                                                    <template v-if="u.status === 'PENDING'">
-                                                        <button @click="approveUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="Setujui">
-                                                            <i class="fa-solid fa-check"></i>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="relative inline-block w-32">
+                                                        <select v-model="u.role" @change="updateUserRole(u)" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none">
+                                                            <option value="VIEWER">VIEWER</option>
+                                                            <option value="STAFF">STAFF</option>
+                                                            <option value="MANAGER">MANAGER</option>
+                                                            <option value="ADMIN">ADMIN</option>
+                                                        </select>
+                                                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-600 text-xs font-bold border border-amber-100 animate-pulse">
+                                                        <i class="fa-solid fa-clock-rotate-left"></i> PENDING
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-slate-600">
+                                                    <div class="flex items-center gap-2">
+                                                        <i :class="u.deviceInfo?.includes('Android') || u.deviceInfo?.includes('iOS') ? 'fa-mobile-alt' : 'fa-laptop'" class="fa-solid text-slate-400"></i>
+                                                        <span class="text-xs">{{ u.deviceInfo || 'Belum Login' }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <div class="flex justify-end items-center gap-2">
+                                                        <button @click="approveUser(u)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500 text-white font-bold text-xs hover:bg-emerald-600 shadow-md shadow-emerald-200 transition-all active:scale-95" title="Setujui">
+                                                            <i class="fa-solid fa-check"></i> Terima
                                                         </button>
-                                                        <button @click="deleteUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors" title="Tolak">
-                                                            <i class="fa-solid fa-xmark"></i>
+                                                        <button @click="deleteUser(u)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-rose-200 text-rose-500 font-bold text-xs hover:bg-rose-50 transition-all active:scale-95" title="Tolak">
+                                                            <i class="fa-solid fa-xmark"></i> Tolak
                                                         </button>
-                                                    </template>
-                                                    <template v-else>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                                <i class="fa-solid fa-users text-blue-500"></i> Daftar Pengguna
+                            </h3>
+                            
+                            <div class="bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden">
+                                <div class="overflow-auto w-full max-h-[700px] custom-scrollbar">
+                                    <table class="w-full text-left border-collapse min-w-[900px]">
+                                        <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-20 shadow-sm">
+                                            <tr class="text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+                                                <th class="px-6 py-4">User Name</th>
+                                                <th class="px-6 py-4">Level Akses</th>
+                                                <th class="px-6 py-4 text-center">Access Photo</th>
+                                                <th class="px-6 py-4">Status Akun</th>
+                                                <th class="px-6 py-4">Sesi Perangkat</th>
+                                                <th class="px-6 py-4 text-right">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            <tr v-for="u in filteredAdminUsers.filter(u => u.status !== 'PENDING')" :key="'active-'+u.username" class="hover:bg-slate-50/80 transition-colors group">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-100">
+                                                            {{ (u.nama || u.username || '?').charAt(0).toUpperCase() }}
+                                                        </div>
+                                                        <div>
+                                                            <div class="font-bold text-slate-800 text-sm">{{ u.nama || 'Tanpa Nama' }}</div>
+                                                            <div class="text-[11px] font-mono text-slate-400 mt-0.5">@{{ u.username }}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="relative inline-block w-32">
+                                                        <select v-model="u.role" @change="updateUserRole(u)" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none transition-all">
+                                                            <option value="VIEWER">VIEWER</option>
+                                                            <option value="STAFF">STAFF</option>
+                                                            <option value="MANAGER">MANAGER</option>
+                                                            <option value="ADMIN">ADMIN</option>
+                                                        </select>
+                                                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <label class="relative inline-flex items-center cursor-pointer justify-center">
+                                                        <input type="checkbox" class="sr-only peer" :checked="u.canPreviewPhoto === true || u.canPreviewPhoto === 1" @change="togglePhotoAccess(u, $event.target.checked)">
+                                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                                    </label>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border" :class="u.status==='AKTIF' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
+                                                        <span class="w-1.5 h-1.5 rounded-full" :class="u.status==='AKTIF' ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                                                        {{ u.status }}
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-slate-600">
+                                                    <div class="flex items-center gap-2">
+                                                        <i :class="u.deviceInfo?.includes('Android') || u.deviceInfo?.includes('iOS') ? 'fa-mobile-alt' : 'fa-laptop'" class="fa-solid text-slate-400"></i>
+                                                        <span class="text-xs">{{ u.deviceInfo || 'Belum Login' }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <div class="flex justify-end items-center gap-2">
                                                         <button @click="toggleUser(u)" 
                                                             :class="u.status==='AKTIF' ? 'text-amber-500 hover:bg-amber-50' : 'text-emerald-500 hover:bg-emerald-50'" 
                                                             class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
                                                             :title="u.status==='AKTIF' ? 'Suspend User' : 'Aktifkan User'">
                                                             <i :class="u.status==='AKTIF' ? 'fa-solid fa-ban' : 'fa-solid fa-power-off'"></i>
                                                         </button>
-                                                        
                                                         <button @click="deleteUser(u)" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus User">
                                                             <i class="fa-solid fa-trash-can"></i>
                                                         </button>
-                                                    </template>
-                                                </div>
-                                            </td>
-
-                                        </tr>
-                                        
-                                        <tr v-if="filteredAdminUsers.length === 0">
-                                            <td colspan="6" class="py-20 text-center">
-                                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <i class="fa-solid fa-user-slash text-3xl text-slate-300"></i>
-                                                </div>
-                                                <h4 class="text-slate-800 font-bold text-sm">User tidak ditemukan</h4>
-                                                <p class="text-slate-400 text-xs mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr v-if="filteredAdminUsers.filter(u => u.status !== 'PENDING').length === 0">
+                                                <td colspan="6" class="py-20 text-center">
+                                                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                        <i class="fa-solid fa-user-slash text-3xl text-slate-300"></i>
+                                                    </div>
+                                                    <h4 class="text-slate-800 font-bold text-sm">User tidak ditemukan</h4>
+                                                    <p class="text-slate-400 text-xs mt-1">Coba sesuaikan kata kunci pencarian Anda.</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="h-10"></div>
@@ -1716,6 +1774,33 @@
             <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileUpload">
         </div>
 
+        <div v-if="showScanner" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-md">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-indigo-500"></i> Scan Barcode
+                    </h3>
+                    <button @click="stopScanner" class="text-slate-400 hover:text-rose-500 transition-colors">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div id="reader" class="rounded-2xl overflow-hidden border-4 border-slate-50 bg-slate-100"></div>
+                    
+                    <p class="text-center text-xs text-slate-500 mt-4">
+                        Posisikan barcode/QR Code di dalam kotak merah
+                    </p>
+                </div>
+                
+                <div class="p-4 bg-slate-50 text-center">
+                    <button @click="stopScanner" class="text-sm font-bold text-slate-600 hover:text-slate-800">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <transition name="fade">
             <div v-if="showProfileModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#050810]/80 backdrop-blur-md">
                 <div class="bg-[#0f172a] border border-white/10 w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-500/10">
@@ -1933,7 +2018,7 @@
 
     <script>
         const { createApp, ref, computed, onMounted, watch, reactive, nextTick } = Vue;
-        const GAS_URL = "https://script.google.com/macros/s/AKfycby3sKx4IW9AgDL3osRAw27ZwIUGQPGVr9zoCw3eBmUl6J-0OHFeyTSXcwouEcGyCz-VWA/exec"; // Ganti dengan URL GAS Anda
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxgLvu6EiCVv6Kw9XkPcClC-oxj9ASvbgWAAPA52SPVszfJPgvpntGobcmz3gKq360IdA/exec"; // Ganti dengan URL GAS Anda
 
         createApp({
             setup() {
@@ -2023,6 +2108,7 @@
                 const showPass = ref(false);
                 const showPassword = ref(false);
 
+                const showScanner = ref(false);
                 let html5QrCode = null;
                 let dashboardInterval = null;
                 let inventoryInterval = null;
@@ -2904,6 +2990,57 @@
                     }
                 };
 
+                const startScanner = () => {
+                    showScanner.value = true;
+                    
+                    // Gunakan nextTick agar elemen #reader sudah ada di DOM sebelum diakses
+                    nextTick(() => {
+                        const readerElement = document.getElementById('reader');
+                        if (!readerElement) {
+                            console.error("Elemen 'reader' tidak ditemukan.");
+                            return;
+                        }
+
+                        if (!html5QrCode) {
+                            html5QrCode = new Html5Qrcode("reader");
+                        }
+
+                        html5QrCode.start(
+                            { facingMode: "environment" }, 
+                            { 
+                                fps: 15, 
+                                qrbox: { width: 250, height: 150 } 
+                            }, 
+                            (decodedText) => {
+                                // Masukkan hasil scan ke v-model inventorySearch
+                                inventorySearch.value = decodedText.trim();
+                                
+                                // Tutup scanner setelah berhasil
+                                stopScanner();
+                                
+                                // Getar singkat sebagai feedback
+                                if (navigator.vibrate) navigator.vibrate(100);
+                            }
+                        ).catch(err => {
+                            console.error("Gagal kamera:", err);
+                            alert("Kamera tidak aktif. Pastikan izin diberikan.");
+                            showScanner.value = false;
+                        });
+                    });
+                };
+
+                const stopScanner = async () => {
+                    if (html5QrCode && html5QrCode.isScanning) {
+                        try {
+                            await html5QrCode.stop();
+                            html5QrCode.clear();
+                        } catch (err) {
+                            console.warn("Gagal menghentikan stream:", err);
+                        }
+                    }
+                    showScanner.value = false;
+                };
+
                 const getJenisClass = (jenis) => {
                     switch(jenis) {
                         case 'MASUK': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
@@ -3462,7 +3599,7 @@
                     cart, dashData, dashFilter, lowStockItems, inputQty, qtyInputRef, searchInputRef, departments, txType, txDept, txNote, searchInMaster, togglePhotoAccess, closeUserModal,
                     handleLogin, handleLogout, fetchDashboard, addToCart, handleScan, processTx, resetTransactionForm, isStockInsufficient, getMasterStock, sortKey, sortOrder, sortBy, sortedMaster,
                     fixDriveUrl, handleCancelTx, getJenisClass, exportToExcel, focusSearch, addToCartWithQty, isVoided, cancellingId, toast, showPass, filterLocation, uniqueLocations, resetAllFilters,
-                    filteredHistory, searchResults, filteredInventory, isUploading, removePhoto,
+                    filteredHistory, searchResults, filteredInventory, isUploading, removePhoto, startScanner, showScanner, stopScanner,
                     isCameraActive, videoFeed, fileInput, showPhotoModal, openUpdateFoto, closePhotoModal, savePhotoOnly,
                     startLiveCamera, stopCamera, takeSnapshot, closeModal, launchGallery, handleFileUpload, openScanner, closeScanner
                 };
