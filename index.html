@@ -60,14 +60,14 @@
                 </div>
 
                 <div class="text-sm font-semibold text-slate-700 tracking-wide">
-                    Memuat data...
+                    Memuat ...
                 </div>
             </div>
         </div>
 
         <div v-if="!isLoggedIn" class="relative flex-1 flex items-center justify-center p-6 bg-slate-900 overflow-hidden min-h-screen">
     
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+            <div class="absolute inset-0 bg-[url('https://media.licdn.com/dms/image/v2/C511BAQE9sGr1n8Ve0w/company-background_10000/company-background_10000/0/1583930720526/bintang_indokarya_gemilang_cover?e=2147483647&v=beta&t=j0UvTPcUAyJtfTJ_B9rRgQbf5KX2cdjB0Mvij1BmtFA')] bg-cover bg-center opacity-40"></div>
             <div class="absolute inset-0 bg-gradient-to-br from-[#0B1120]/95 via-[#0D1425]/80 to-indigo-900/90 backdrop-blur-sm"></div>
 
             <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none"></div>
@@ -817,7 +817,7 @@
                                     <i class="fa-solid fa-check-circle mr-1"></i> Ready
                                 </button>
 
-                                <button 
+                                <button v-if="['ADMIN', 'STAFF', 'MANAGER'].includes(userData.role)" 
                                     @click="stockFilter = 'empty'"
                                     :class="stockFilter === 'empty'
                                         ? 'bg-rose-600 text-white shadow-md shadow-rose-200'
@@ -1840,7 +1840,7 @@
         </transition>
 
         <transition name="fade">
-            <div v-if="showLowStock" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div v-show="showLowStock" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                 <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in duration-300 ring-1 ring-slate-100">
                     
                     <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-start bg-gradient-to-r from-rose-50/50 to-white">
@@ -2329,63 +2329,58 @@
                 };
 
                 const fetchAllData = async () => {
-
                     try {
-
-                        const [resBase, resInventory, resDash] = await Promise.all([
-
+                        const [resBase, resInventory, resDash, resLow] = await Promise.all([
                             callAPI('GET_INITIAL_DATA'),
-
                             callAPI('ADMIN_GET_ITEMS'),
-
                             callAPI('GET_DASHBOARD', {
                                 filterType: dashFilter.value.type,
                                 dateStart: dashFilter.value.start,
                                 dateEnd: dashFilter.value.end,
                                 dept: dashFilter.value.dept
-                            })
-
+                            }),
+                            callAPI('GET_LOW_STOCK_PR', {}) // Panggil di sini agar data standby
                         ]);
 
-                        // ===== METADATA =====
-                        if (resBase && resBase.status === 'success') {
+                        // 1. Metadata
+                        if (resBase?.status === 'success') {
                             departments.value = resBase.departments || [];
                             categoryOptions.value = resBase.categories || [];
                         }
 
-                        // ===== INVENTORY =====
-                        if (resInventory && resInventory.status === 'success' && Array.isArray(resInventory.data)) {
-
-                            inventory.value = resInventory.data.map(i => ({
+                        // 2. Inventory
+                        if (resInventory?.status === 'success') {
+                            inventory.value = (resInventory.data || []).map(i => ({
                                 ...i,
                                 stok: Number(i.stok) || 0,
                                 minStok: Number(i.minStok) || 0,
                                 imgFailed: false
                             }));
-
-                        } else {
-                            console.error("Gagal load inventory:", resInventory?.message);
                         }
 
-                        // ===== DASHBOARD =====
+                        // 3. Dashboard & Recent Transactions
                         if (resDash) {
-
                             dashData.value = {
                                 totalItem: resDash.totalItem,
                                 totalStok: resDash.totalStok,
                                 totalLowStock: resDash.totalLowStock,
                                 selisihOpname: resDash.selisihOpname
                             };
-
                             recentTx.value = resDash.recentTx || [];
                         }
 
+                        // 4. Low Stock PR (SIMPAN DI SINI)
+                        if (resLow) {
+                            // Langsung filter data aktif agar modal tinggal pakai
+                            const rawData = Array.isArray(resLow) ? resLow : (resLow.data || []);
+                            lowStockItems.value = rawData.filter(i =>
+                                (i.status || 'AKTIF').toUpperCase() === 'AKTIF'
+                            );
+                        }
+
                     } catch (err) {
-
                         console.error("FetchAllData error:", err);
-
                     }
-
                 };
 
                 const fetchInventory = async () => {
@@ -2436,21 +2431,7 @@
                 };
 
                 const fetchLowStock = async () => {
-                    try {
-                        const res = await callAPI('GET_LOW_STOCK_PR', {});
-                        
-                        if (res.status === 'success') {
-                            lowStockItems.value = (res.data || []).filter(i => 
-                                (i.status || 'AKTIF').toUpperCase() === 'AKTIF'
-                            );
-                        } else {
-                            lowStockItems.value = [];
-                        }
-
-                    } catch(err) {
-                        console.error("Fetch low stock error:", err);
-                        lowStockItems.value = [];
-                    }
+                    showLowStock.value = true;
                 };
 
                 const stockRules = {
