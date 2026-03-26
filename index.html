@@ -67,11 +67,14 @@
 
         <div v-if="!isLoggedIn" class="relative flex-1 flex items-center justify-center p-6 bg-slate-900 overflow-hidden min-h-screen">
     
-            <div class="absolute inset-0 bg-[url('https://media.licdn.com/dms/image/v2/C511BAQE9sGr1n8Ve0w/company-background_10000/company-background_10000/0/1583930720526/bintang_indokarya_gemilang_cover?e=2147483647&v=beta&t=j0UvTPcUAyJtfTJ_B9rRgQbf5KX2cdjB0Mvij1BmtFA')] bg-cover bg-center opacity-40"></div>
-            <div class="absolute inset-0 bg-gradient-to-br from-[#0B1120]/95 via-[#0D1425]/80 to-indigo-900/90 backdrop-blur-sm"></div>
+            <div class="absolute inset-0 bg-[url('https://media.licdn.com/dms/image/v2/C511BAQE9sGr1n8Ve0w/company-background_10000/company-background_10000/0/1583930720526/bintang_indokarya_gemilang_cover?e=2147483647&v=beta&t=j0UvTPcUAyJtfTJ_B9rRgQbf5KX2cdjB0Mvij1BmtFA')] bg-cover bg-center"></div>
 
-            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0B1120]/60 via-[#0D1425]/40 to-indigo-900/50"></div>
+            
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px]"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]"></div>
+            </div>
 
             <div class="relative z-10 bg-white/95 backdrop-blur-2xl w-full max-w-[420px] rounded-[3.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] border border-white p-2">
     
