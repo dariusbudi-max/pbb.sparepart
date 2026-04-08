@@ -2043,13 +2043,6 @@ createApp({
                     handleLogout();
                 }
             }
-
-            const today = new Date().toISOString().split('T')[0];
-
-            dashFilter.value.dateStart = today;
-            dashFilter.value.dateEnd = today;
-
-            fetchDashboard();
         });
 
         return {
