@@ -115,6 +115,7 @@ createApp({
         let html5QrCode = null;
         let isScanning = false;
         let lastScan = null;
+        let audioCtx = null;
         let dashboardInterval = null;
         let inventoryInterval = null;
 
@@ -788,6 +789,7 @@ createApp({
         };
 
         const openScanner = () => {
+            initAudio();
             scannerActive.value = true;
             isScanning = true;
 
@@ -828,20 +830,30 @@ createApp({
             });
         };
 
+        const initAudio = () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        };
+
         const playBeep = () => {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = ctx.createOscillator();
-            const gain = ctx.createGain();
+            if (!audioCtx) return;
+
+            const oscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
 
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(1000, ctx.currentTime); // nada
-            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
 
             oscillator.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(audioCtx.destination);
 
             oscillator.start();
-            oscillator.stop(ctx.currentTime + 0.1); // durasi beep
+            oscillator.stop(audioCtx.currentTime + 0.1);
         };
 
         const closeScanner = async () => {
@@ -2075,7 +2087,7 @@ createApp({
             scannerActive, isCameraActive, videoFeed, fileInput, startScanner, stopScanner,
             handleScan, openScanner, closeScanner, startLiveCamera, stopCamera, takeSnapshot,
             launchGallery, handleFileUpload, previewImage, openUpdateFoto, savePhotoOnly,
-            removePhoto, isUploading, togglePhotoAccess, toggleUser, playBeep,
+            removePhoto, isUploading, togglePhotoAccess, toggleUser, playBeep, initAudio,
 
             // 7. SPP (SURAT PERMOHONAN PEMBELIAN) & RESERVASI
             summarySppItems, inputKodeManual, tambahSemuaKeSpp, tambahItemManualByKode, kosongkanSpp,
