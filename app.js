@@ -1,7 +1,6 @@
 
 const { createApp, ref, computed, onMounted, watch, reactive, nextTick } = Vue;
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxgLvu6EiCVv6Kw9XkPcClC-oxj9ASvbgWAAPA52SPVszfJPgvpntGobcmz3gKq360IdA/exec";
-
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxQpDdOIGImQ8AVy29U42mxkwxJfXkAzMKuUzF4MBOTzg94QEkFY262e3HUILFd4K5nyw/exec";
 
 createApp({
     setup() {
@@ -114,6 +113,8 @@ createApp({
 
         const showScanner = ref(false);
         let html5QrCode = null;
+        let isScanning = false;
+        let lastScan = null;
         let dashboardInterval = null;
         let inventoryInterval = null;
 
@@ -344,16 +345,14 @@ createApp({
                         dateEnd: dashFilter.value.end,
                         dept: dashFilter.value.dept
                     }),
-                    callAPI('GET_LOW_STOCK_PR', {}) // Panggil di sini agar data standby
+                    callAPI('GET_LOW_STOCK_PR', {})
                 ]);
 
-                // 1. Metadata
                 if (resBase?.status === 'success') {
                     departments.value = resBase.departments || [];
                     categoryOptions.value = resBase.categories || [];
                 }
 
-                // 2. Inventory
                 if (resInventory?.status === 'success') {
                     inventory.value = (resInventory.data || []).map(i => ({
                         ...i,
@@ -363,7 +362,6 @@ createApp({
                     }));
                 }
 
-                // 3. Dashboard & Recent Transactions
                 if (resDash) {
                     dashData.value = {
                         totalItem: resDash.totalItem,
@@ -374,17 +372,21 @@ createApp({
                     recentTx.value = resDash.recentTx || [];
                 }
 
-                // 4. Low Stock PR (SIMPAN DI SINI)
-                if (resLow) {
-                    // Langsung filter data aktif agar modal tinggal pakai
-                    const rawData = Array.isArray(resLow) ? resLow : (resLow.data || []);
-                    lowStockItems.value = rawData.filter(i =>
-                        (i.status || 'AKTIF').toUpperCase() === 'AKTIF'
-                    );
+                if (inventory.value.length) {
+                    lowStockItems.value = inventory.value.filter(i => {
+                        // Hanya aktif
+                        if ((i.status || 'AKTIF').toUpperCase() !== 'AKTIF') return false;
+                        if (!i.minStok || i.minStok <= 0) return false;
+                        return i.stok <= i.minStok;
+                    });
+
+                    dashData.value.totalLowStock = lowStockItems.value.length;
                 }
 
             } catch (err) {
                 console.error("FetchAllData error:", err);
+            } finally {
+                if (!silent) loading.value = false;
             }
         };
 
@@ -787,6 +789,7 @@ createApp({
 
         const openScanner = () => {
             scannerActive.value = true;
+            isScanning = true;
 
             nextTick(() => {
                 const readerElement = document.getElementById('reader');
@@ -803,15 +806,20 @@ createApp({
                     { facingMode: "environment" },
                     { fps: 15, qrbox: 250 },
                     (txt) => {
+                        if (txt === lastScan) return;
+                        lastScan = txt;
                         const item = inventory.value.find(i => i.kode === txt);
 
                         if (item) {
                             addToCartWithQty(item);
-                            closeScanner();
+                            playBeep();
                             console.log("Scan Berhasil: " + item.nama);
                         } else {
                             alert("Item Tidak Terdaftar: " + txt);
                         }
+                        setTimeout(() => {
+                            lastScan = null;
+                        }, 1500);
                     }
                 ).catch(err => {
                     console.error("Gagal memulai kamera:", err);
@@ -820,18 +828,35 @@ createApp({
             });
         };
 
+        const playBeep = () => {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(1000, ctx.currentTime); // nada
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.1); // durasi beep
+        };
+
         const closeScanner = async () => {
+            isScanning = false;
+
             if (html5QrCode) {
                 try {
-                    await html5QrCode.stop(); // Hentikan stream kamera
-                    scannerActive.value = false;
+                    await html5QrCode.stop();
+                    await html5QrCode.clear();
                 } catch (err) {
                     console.error("Gagal menghentikan kamera:", err);
-                    scannerActive.value = false; // Tetap tutup modal jika error
                 }
-            } else {
-                scannerActive.value = false;
             }
+
+            scannerActive.value = false;
         };
 
         const focusSearch = () => {
@@ -846,17 +871,14 @@ createApp({
         };
 
         const addToCartWithQty = (item, customQty = null) => {
-            // 1. Tangkap jumlah input: prioritas argumen customQty, lalu inputQty, default 1
             const rawInput = customQty !== null ? customQty : inputQty.value;
             const jumlahInput = (rawInput === '' || rawInput <= 0) ? 1 : Number(rawInput);
 
             const existingIndex = cart.value.findIndex(c => c.kode === item.kode);
 
             if (existingIndex !== -1) {
-                // Jika sudah ada, tambahkan quantity-nya (Math addition, bukan string concatenation)
                 cart.value[existingIndex].qty += jumlahInput;
             } else {
-                // Jika belum ada, buat entri baru
                 cart.value.push({
                     kode: item.kode,
                     nama: item.nama,
@@ -866,13 +888,11 @@ createApp({
                 });
             }
 
-            showCart.value = false; // Munculkan cart jika disembunyikan
+            showCart.value = false;
 
-            // 2. Sentralisasi Reset Form
             searchQuery.value = '';
-            inputQty.value = ''; // Reset kosong agar dihitung 1 pada scan berikutnya
+            inputQty.value = '';
 
-            // 3. Kembalikan kursor dengan aman
             nextTick(() => {
                 if (qtyInputRef.value) qtyInputRef.value.focus();
             });
@@ -998,11 +1018,9 @@ createApp({
             const kodeCari = inputKodeManual.value.trim().toUpperCase();
             if (!kodeCari) return;
 
-            // 1. Cari di data master inventory (VLOOKUP)
             const masterItem = inventory.value.find(i => i.kode.toUpperCase() === kodeCari);
 
             if (masterItem) {
-                // 2. Cek Duplikasi (Jangan sampai barang yang sama masuk 2x)
                 const exists = summarySppItems.value.find(s => s.kode === masterItem.kode);
 
                 if (exists) {
@@ -1011,13 +1029,11 @@ createApp({
                     return;
                 }
 
-                // 3. Logika Perhitungan Qty (Sama dengan logika stok kritis)
                 const stokSekarang = Number(masterItem.stok || 0);
                 const batasMinimal = Number(masterItem.minStok || 0);
                 let saranQty = (batasMinimal * 2) - stokSekarang;
                 if (saranQty <= 0) saranQty = 1;
 
-                // 4. Masukkan ke list SPP
                 summarySppItems.value.push({
                     kode: masterItem.kode || '-',
                     nama: masterItem.nama || '-',
@@ -1028,7 +1044,6 @@ createApp({
                     keterangan: ''
                 });
 
-                // 5. Bersihkan Input
                 inputKodeManual.value = '';
 
             } else {
@@ -1046,18 +1061,15 @@ createApp({
             let duplicateCount = 0;
 
             lowStockItems.value.forEach(item => {
-                // 1. Cek Duplikasi
                 const exists = summarySppItems.value.find(s => s.kode === item.kode);
 
                 if (!exists) {
                     const stokSekarang = Number(item.stok || 0);
                     const batasMinimal = Number(item.minStok || 0);
 
-                    // 2. Hitung Saran Qty
                     let saranQty = (batasMinimal * 2) - stokSekarang;
                     if (saranQty <= 0) saranQty = 1;
 
-                    // 3. Push ke Summary
                     summarySppItems.value.push({
                         kode: item.kode || '-',
                         nama: item.nama || '-',
@@ -1073,7 +1085,6 @@ createApp({
                 }
             });
 
-            // 4. Feedback & Navigasi menggunakan Toast
             if (count > 0) {
                 showToast(`Berhasil menambah ${count} item ke SPP`, "success");
                 showLowStock.value = false;
@@ -1089,7 +1100,6 @@ createApp({
             while (items.length > 0) {
                 chunks.push(items.splice(0, 17));
             }
-            // Jika benar-benar kosong, kasih array kosong agar minimal 1 kertas muncul
             return chunks.length > 0 ? chunks : [[]];
         });
 
@@ -1111,7 +1121,6 @@ createApp({
 
         const downloadSPPPDF = () => {
             const { jsPDF } = window.jspdf;
-            // Inisialisasi A4 Landscape (297mm x 210mm)
             const doc = new jsPDF('l', 'mm', 'a4');
             const totalPages = chunkedSppItems.value.length;
 
@@ -1282,7 +1291,6 @@ createApp({
             showPopupDetail.value = true;
         };
 
-        // Fungsi Konfirmasi Masuk ke Form Reservasi
         const tambahkanKeForm = () => {
             const item = selectedItem.value;
             const exist = reservasiItems.value.find(i => i.kode === item.kode);
@@ -1317,7 +1325,6 @@ createApp({
             return pages;
         });
 
-        // Fungsi Cetak (Memicu dialog print browser)
         const handlePrint = () => {
             if (reservasiItems.value.length === 0) {
                 alert("Daftar permintaan masih kosong!");
@@ -1367,16 +1374,13 @@ createApp({
         const sortBy = (key) => {
             if (sortKey.value === key) {
                 if (sortOrder.value === 1) {
-                    // Jika sedang Asc, ubah ke Desc
                     sortOrder.value = -1;
                 } else {
-                    // Jika sedang Desc, matikan sortir (Reset)
                     sortKey.value = '';
                     sortOrder.value = 1;
                     showToast("Urutan dikembalikan ke asli", "success");
                 }
             } else {
-                // Klik kolom baru
                 sortKey.value = key;
                 sortOrder.value = 1;
             }
@@ -1432,12 +1436,10 @@ createApp({
                 });
 
                 if (res.status === 'success') {
-                    // Update di UI lokal
                     const targetItem = inventory.value.find(i => i.kode === locationForm.value.kode);
                     if (targetItem) targetItem.lokasi = locationForm.value.lokasi;
 
                     showLocationModal.value = false;
-                    // Opsional: tambahkan toast/notifikasi sukses kecil di sini
                 } else {
                     alert("Gagal: " + res.message);
                 }
@@ -1454,7 +1456,6 @@ createApp({
                     alert(res.message);
                     showItemModal.value = false;
 
-                    // Refresh Data Barang agar tabel terupdate secara real-time
                     const result = await callAPI('ADMIN_GET_ITEMS');
                     if (result.status === 'success' && Array.isArray(result.data)) {
                         inventory.value = result.data;
@@ -1462,7 +1463,6 @@ createApp({
                         inventory.value = result;
                     }
 
-                    // Reset form setelah simpan sukses
                     formItem.value = { kode: '', nama: '', category: '', minStok: 0, foto: '' };
                 } else {
                     alert("Error: " + res.message);
@@ -1908,7 +1908,7 @@ createApp({
 
             return inventory.value.filter(item => {
 
-                if (item.status !== 'AKTIF') return false
+                if (String(item.status || '').trim().toUpperCase() !== 'AKTIF') return false
 
                 const qty = Number(item.stok || 0)
 
@@ -1933,6 +1933,36 @@ createApp({
                 return stockCondition && categoryCondition && matchesSearch
             })
         });
+
+        const totalLowStockUI = computed(() => {
+            return inventory.value.filter(i => {
+                const status = String(i.status || '').trim().toUpperCase()
+                if (status !== 'AKTIF') return false
+
+                const stok = Number(i.stok || 0)
+                const min = Number(i.minStok || 0)
+
+                return stok <= min
+            }).length
+        })
+
+        const setToday = () => {
+            const today = new Date().toISOString().split('T')[0];
+            dashFilter.value.dateStart = today;
+            dashFilter.value.dateEnd = today;
+            fetchDashboard();
+        };
+
+        const setThisWeek = () => {
+            const now = new Date();
+            const first = new Date(now.setDate(now.getDate() - now.getDay()));
+            const last = new Date(now.setDate(first.getDate() + 6));
+
+            dashFilter.value.dateStart = first.toISOString().split('T')[0];
+            dashFilter.value.dateEnd = last.toISOString().split('T')[0];
+
+            fetchDashboard();
+        };
 
         const searchInMaster = computed(() => {
 
@@ -2000,11 +2030,9 @@ createApp({
                 if (res.status === 'success') {
                     isLoggedIn.value = true;
 
-                    // Gabungkan data: Pastikan res.canPreviewPhoto masuk ke userData
                     userData.value = {
                         ...parsed,
                         ...res,
-                        // Paksa konversi ke boolean agar v-if tidak bingung
                         canPreviewPhoto: res.canPreviewPhoto === true || res.canPreviewPhoto === 1 || res.canPreviewPhoto === "TRUE"
                     };
 
@@ -2015,6 +2043,13 @@ createApp({
                     handleLogout();
                 }
             }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            dashFilter.value.dateStart = today;
+            dashFilter.value.dateEnd = today;
+
+            fetchDashboard();
         });
 
         return {
@@ -2030,7 +2065,7 @@ createApp({
             // 3. INVENTORY & MASTER DATA
             inventory, inventorySearch, searchQuery, stockFilter, categoryOptions, categoryFilter,
             filterLocation, uniqueLocations, resetAllFilters, sortedMaster, sortKey, sortOrder,
-            sortBy, filteredInventory, getMasterStock, searchInMaster, focusSearch,
+            sortBy, filteredInventory, getMasterStock, searchInMaster, focusSearch, totalLowStockUI,
             searchInputRef, departments, fixDriveUrl, searchResults,
 
             // 4. ITEM CRUD & MODALS
@@ -2047,7 +2082,7 @@ createApp({
             scannerActive, isCameraActive, videoFeed, fileInput, startScanner, stopScanner,
             handleScan, openScanner, closeScanner, startLiveCamera, stopCamera, takeSnapshot,
             launchGallery, handleFileUpload, previewImage, openUpdateFoto, savePhotoOnly,
-            removePhoto, isUploading, togglePhotoAccess, toggleUser,
+            removePhoto, isUploading, togglePhotoAccess, toggleUser, playBeep,
 
             // 7. SPP (SURAT PERMOHONAN PEMBELIAN) & RESERVASI
             summarySppItems, inputKodeManual, tambahSemuaKeSpp, tambahItemManualByKode, kosongkanSpp,
@@ -2060,7 +2095,7 @@ createApp({
             profileForm, loadingProfile, openEditProfile, handleUpdateProfile, approveWithRole,
 
             // 9. DASHBOARD & REPORTING
-            dashData, dashFilter, fetchDashboard, handlePrint, downloadPDF,
+            dashData, dashFilter, fetchDashboard, handlePrint, downloadPDF, setToday, setThisWeek,
             downloadSPPPDF, exportToExcel, docNumber
         };
     }
